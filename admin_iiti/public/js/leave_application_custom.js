@@ -7,8 +7,6 @@ frappe.ui.form.on("Leave Application", {
 			})
 			
 		}
-		//frm.trigger("validation_check");
-	// 	frm.trigger("leave_approver");
      },
 	refresh:function(frm){
 		if (!frm.is_new()) {
