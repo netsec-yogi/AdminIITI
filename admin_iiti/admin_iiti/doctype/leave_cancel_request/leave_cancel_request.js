@@ -14,9 +14,7 @@ frappe.ui.form.on('Leave cancel Request', {
 		}
 	},
 	onload: function(frm) {
-		console.log(frm);
-
-		//set_status open for employee();
+		
 		if (!frm.is_new()) {
 			if (!frm.is_new()) {
 				if (frappe.session.user === frm.doc.owner) {
