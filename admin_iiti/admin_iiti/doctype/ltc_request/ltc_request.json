@@ -1,0 +1,496 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2023-01-03 14:43:37.468437",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "naming_series",
+  "employee",
+  "employee_name",
+  "pay_level",
+  "column_break_5",
+  "is_dependence",
+  "leave_application",
+  "leave_type",
+  "leave_type_name",
+  "leave_days",
+  "leave_from_date",
+  "leave_to_date",
+  "department",
+  "section_break_10",
+  "specify_whether",
+  "destination",
+  "nearest_railway",
+  "leave_encashment",
+  "ltc_advance",
+  "column_break_15",
+  "departure_date",
+  "arrival_date",
+  "encashment_days",
+  "ltc_advance_amount",
+  "upload_tickets",
+  "column_break_19",
+  "block_year",
+  "mode_of_travel",
+  "class_of_journey",
+  "ninety_percent_ltc_amount",
+  "document_section",
+  "required_document",
+  "ltc_details_section",
+  "ltc_claimed",
+  "i_undertake_section",
+  "a",
+  "b",
+  "admin_section_tab",
+  "amount_advance",
+  "calculation_basic_pay",
+  "column_break_39",
+  "calculation_of_encashment_of_el",
+  "section_break_27",
+  "status",
+  "column_break_29",
+  "approver",
+  "document_update__date_time_details_section",
+  "ltc_processed_by",
+  "ltc_checked_by",
+  "ltc_recommended_by",
+  "ltc_approved_by",
+  "column_break_50",
+  "ltc_processed_date_time",
+  "ltc_checked_date_time",
+  "ltc_recommended_date_time",
+  "ltc_approved_date_time",
+  "reject_comment",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Naming Series",
+   "options": "AD-LTC-.YYYY.-",
+   "reqd": 1
+  },
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "Employee",
+   "options": "Employee",
+   "reqd": 1
+  },
+  {
+   "fieldname": "employee_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Employee Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "pay_level",
+   "fieldtype": "Link",
+   "label": "Pay Level",
+   "options": "Pay Level",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "leave_application",
+   "fieldtype": "Link",
+   "label": "Leave Application",
+   "mandatory_depends_on": "eval:doc.is_dependence == 0",
+   "options": "Leave Application"
+  },
+  {
+   "fetch_from": "leave_application.leave_type",
+   "fieldname": "leave_type",
+   "fieldtype": "Data",
+   "label": "Leave Type"
+  },
+  {
+   "fieldname": "leave_type_name",
+   "fieldtype": "Data",
+   "label": "Leave Type Name"
+  },
+  {
+   "fetch_from": "employee.department",
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "label": "Department",
+   "options": "Department"
+  },
+  {
+   "fieldname": "section_break_10",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "specify_whether",
+   "fieldtype": "Select",
+   "label": "Specify Whether",
+   "options": "\nHome Town\nAny Where",
+   "reqd": 1
+  },
+  {
+   "fieldname": "destination",
+   "fieldtype": "Data",
+   "label": "Destination",
+   "reqd": 1
+  },
+  {
+   "fieldname": "nearest_railway",
+   "fieldtype": "Data",
+   "label": "Nearest Railway/Airport",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_15",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "departure_date",
+   "fieldtype": "Date",
+   "label": "Departure Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "arrival_date",
+   "fieldtype": "Date",
+   "label": "Arrival Date",
+   "reqd": 1
+  },
+  {
+   "depends_on": "leave_encashment",
+   "fieldname": "encashment_days",
+   "fieldtype": "Data",
+   "label": "No. of EL to Encashment"
+  },
+  {
+   "fieldname": "column_break_19",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "block_year",
+   "fieldtype": "Data",
+   "label": "Block Year",
+   "reqd": 1
+  },
+  {
+   "fieldname": "mode_of_travel",
+   "fieldtype": "Select",
+   "label": "Mode of Travel",
+   "options": "\nAir\nTrain\nBus",
+   "reqd": 1
+  },
+  {
+   "fieldname": "class_of_journey",
+   "fieldtype": "Data",
+   "label": "Class of Journey",
+   "reqd": 1
+  },
+  {
+   "depends_on": "eval:doc.ltc_advance == 1",
+   "fieldname": "ltc_advance_amount",
+   "fieldtype": "Data",
+   "label": "Actual Cost of Travel",
+   "mandatory_depends_on": "eval:doc.ltc_advance == 1"
+  },
+  {
+   "fieldname": "ltc_details_section",
+   "fieldtype": "Section Break",
+   "label": "LTC Details"
+  },
+  {
+   "fieldname": "ltc_claimed",
+   "fieldtype": "Table",
+   "label": "LTC Claimed",
+   "options": "LTC Claimed Details",
+   "reqd": 1
+  },
+  {
+   "fieldname": "i_undertake_section",
+   "fieldtype": "Section Break",
+   "label": "I undertake"
+  },
+  {
+   "default": "0",
+   "description": "To furnish the adjustment bill within one month from the date of completion of return journey when advance is drown or within three months when advance is not drown.",
+   "fieldname": "a",
+   "fieldtype": "Check",
+   "label": "A",
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "description": "To Produce air tickets with stamped boarding pass/railway tickets/bus cash receipts (public transport only ) for both the onward as well as return journeys.",
+   "fieldname": "b",
+   "fieldtype": "Check",
+   "label": "B",
+   "reqd": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "LTC Request",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "leave_encashment",
+   "fieldtype": "Check",
+   "label": "Leave Encashment"
+  },
+  {
+   "depends_on": "ltc_advance_amount",
+   "fieldname": "ninety_percent_ltc_amount",
+   "fieldtype": "Float",
+   "label": "Ninety Percent LTC Amount",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_27",
+   "fieldtype": "Tab Break",
+   "hidden": 1,
+   "label": "Status Change Section"
+  },
+  {
+   "default": "registrar@iiti.ac.in",
+   "fieldname": "approver",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Approver",
+   "options": "User"
+  },
+  {
+   "fieldname": "column_break_29",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "in_filter": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "options": "Open\nProcessed\nChecked\nRecommended\nSanction\nCancelled\nRejected"
+  },
+  {
+   "fieldname": "leave_days",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Leave Days",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "leave_application.from_date",
+   "fieldname": "leave_from_date",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Leave From Date"
+  },
+  {
+   "fetch_from": "leave_application.to_date",
+   "fieldname": "leave_to_date",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Leave To Date"
+  },
+  {
+   "fieldname": "document_section",
+   "fieldtype": "Section Break",
+   "label": "Document"
+  },
+  {
+   "depends_on": "eval:doc.ltc_advance_amount == 1",
+   "fieldname": "required_document",
+   "fieldtype": "Attach",
+   "label": "Required Document",
+   "mandatory_depends_on": "eval:doc.ltc_advance_amount == 1"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_dependence",
+   "fieldtype": "Check",
+   "label": "Is Request for only dependents"
+  },
+  {
+   "fieldname": "admin_section_tab",
+   "fieldtype": "Tab Break",
+   "label": "Admin Section"
+  },
+  {
+   "fieldname": "amount_advance",
+   "fieldtype": "Float",
+   "hidden": 1,
+   "label": "LTC Amount Advance Admissible",
+   "mandatory_depends_on": "eval:doc.status == 'Processed'"
+  },
+  {
+   "fieldname": "calculation_basic_pay",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "The Calculation For Which is as under (Basic Pay + Dearness Allowance)",
+   "mandatory_depends_on": "eval:doc.status == 'Processed'"
+  },
+  {
+   "fieldname": "column_break_39",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "calculation_of_encashment_of_el",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Amount of  Encashment Admissible",
+   "mandatory_depends_on": "eval:doc.status == 'Processed'"
+  },
+  {
+   "fieldname": "document_update__date_time_details_section",
+   "fieldtype": "Section Break",
+   "label": "Document Update  Date time Details"
+  },
+  {
+   "fieldname": "ltc_processed_by",
+   "fieldtype": "Data",
+   "label": "LTC Processed By"
+  },
+  {
+   "fieldname": "ltc_checked_by",
+   "fieldtype": "Data",
+   "label": "LTC Checked By"
+  },
+  {
+   "fieldname": "ltc_recommended_by",
+   "fieldtype": "Data",
+   "label": "LTC Recommended By"
+  },
+  {
+   "fieldname": "ltc_approved_by",
+   "fieldtype": "Data",
+   "label": "LTC Approved By"
+  },
+  {
+   "fieldname": "column_break_50",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "ltc_processed_date_time",
+   "fieldtype": "Datetime",
+   "label": "LTC Processed Date Time"
+  },
+  {
+   "fieldname": "ltc_checked_date_time",
+   "fieldtype": "Datetime",
+   "label": "LTC Checked Date time"
+  },
+  {
+   "fieldname": "ltc_recommended_date_time",
+   "fieldtype": "Datetime",
+   "label": "LTC Recommended Date time"
+  },
+  {
+   "fieldname": "ltc_approved_date_time",
+   "fieldtype": "Datetime",
+   "label": "LTC Approved Date Time"
+  },
+  {
+   "default": "0",
+   "fieldname": "ltc_advance",
+   "fieldtype": "Check",
+   "label": "LTC Advance"
+  },
+  {
+   "depends_on": "eval:doc.ltc_advance == 1",
+   "fieldname": "upload_tickets",
+   "fieldtype": "Attach",
+   "label": "Upload Tickets",
+   "mandatory_depends_on": "eval:doc.ltc_advance == 1"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "reject_comment",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Reject Comment",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [
+  {
+   "link_doctype": "LTC Office Memorandum",
+   "link_fieldname": "ltc_reference_number"
+  }
+ ],
+ "modified": "2023-06-28 15:56:56.854858",
+ "modified_by": "Administrator",
+ "module": "Admin IITI",
+ "name": "LTC Request",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "search_fields": "employee_name",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [
+  {
+   "color": "Red",
+   "title": "Open"
+  },
+  {
+   "color": "Pink",
+   "title": "Processed"
+  },
+  {
+   "color": "Purple",
+   "title": "Checked"
+  },
+  {
+   "color": "Yellow",
+   "title": "Recommended"
+  },
+  {
+   "color": "Green",
+   "title": "Approved"
+  },
+  {
+   "color": "Green",
+   "title": "Sanction"
+  },
+  {
+   "color": "Red",
+   "title": "Not Approved"
+  },
+  {
+   "color": "Red",
+   "title": "Cancelled"
+  },
+  {
+   "color": "Red",
+   "title": "Rejected"
+  }
+ ]
+}

@@ -1,0 +1,24 @@
+{% if not jQuery.isEmptyObject(details) %}
+<div class="print-heading text-center">
+    <h2><b>Leave Balance Sheet</b></h2>
+</div>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th style="width: 16%;border:1px solid #000 !important">{{ __("Leave Type") }}</th>
+            <!-- <th style="width: 16%" class="text-right">{{ __("Total Leave Credited") }}</th>
+            <th style="width: 16%" class="text-right">{{ __("Leave Lapsed") }}</th>
+            <th style="width: 16%" class="text-right">{{ __("Leave Availed") }}</th>
+            <th style="width: 16%" class="text-right">{{ __("Pending Leave") }}</th> -->
+            <th style="width: 16%;border:1px solid #000 !important" class="text-right">{{ __("Leave Balance") }}</th>
+        </tr>
+    </thead>
+    <tbody>{% for(const [key, value] of Object.entries(details.leave_allocation)) { %}<tr>
+            <td style="border:1px solid #000 !important"> {%= key %} </td>
+            <!-- <td class="text-right"> {%= value["total_leaves"] %} </td>
+            <td class="text-right"> {%= value["expired_leaves"] %} </td>
+            <td class="text-right"> {%= value["leaves_taken"] %} </td>
+            <td class="text-right"> {%= value["pending_leaves"] %} </td> -->
+            <td style="border:1px solid #000 !important" class="text-right"> {%= value["remaining_leaves"] %} </td>
+        </tr>{% } %}</tbody>
+</table>{% else %}<p style="margin-top: 30px;"> No Leave has been allocated. </p>{% endif %}

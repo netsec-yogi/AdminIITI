@@ -1,0 +1,77 @@
+{
+ "actions": [],
+ "autoname": "autoincrement",
+ "creation": "2023-06-02 10:46:36.909179",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "departure_date_time",
+  "departure_place",
+  "arrival_date_time",
+  "arrival_place",
+  "mode",
+  "fare"
+ ],
+ "fields": [
+  {
+   "fieldname": "departure_date_time",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Departure Date Time"
+  },
+  {
+   "fieldname": "departure_place",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Departure Place"
+  },
+  {
+   "fieldname": "arrival_date_time",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Arrival Date Time"
+  },
+  {
+   "fieldname": "arrival_place",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Arrival Place"
+  },
+  {
+   "columns": 1,
+   "fieldname": "mode",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Mode & Class of Trave",
+   "width": "1"
+  },
+  {
+   "columns": 1,
+   "fieldname": "fare",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Fare",
+   "width": "1"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2023-06-02 10:50:11.205390",
+ "modified_by": "Administrator",
+ "module": "Admin IITI",
+ "name": "Air Tickets Details",
+ "naming_rule": "Autoincrement",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

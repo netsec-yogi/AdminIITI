@@ -13,6 +13,7 @@ app_license = "MIT"
 # include js, css files in header of desk.html
 # app_include_css = "/assets/admin_iiti/css/admin_iiti.css"
 # app_include_js = "/assets/admin_iiti/js/admin_iiti.js"
+app_include_js = "/assets/admin_iiti/js/custom_side_menu.js"
 
 # include js, css files in header of web template
 # web_include_css = "/assets/admin_iiti/css/admin_iiti.css"
@@ -30,6 +31,16 @@ app_license = "MIT"
 
 # include js in doctype views
 # doctype_js = {"doctype" : "public/js/doctype.js"}
+
+doctype_js = {
+        "Leave Application" : "public/js/leave_application_custom.js",
+           "Stock Entry" : "public/js/custom_stock_entry.js",
+    }
+    
+doctype_list_js = {
+    "Leave Application" : "public/js/leave_application_list_custom.js"
+
+    }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
@@ -94,9 +105,10 @@ app_license = "MIT"
 # ---------------
 # Override standard doctype classes
 
-# override_doctype_class = {
+override_doctype_class = {
 #	"ToDo": "custom_app.overrides.CustomToDo"
-# }
+	"Leave Application": "admin_iiti.overrides.CustomLeaveApplication"
+}
 
 # Document Events
 # ---------------
@@ -109,6 +121,14 @@ app_license = "MIT"
 #		"on_trash": "method"
 #	}
 # }
+
+doc_events ={
+
+    "Leave Application":{
+
+        "after_insert":"admin_iiti.overrides.after_insert_recommeder"
+	}
+}
 
 # Scheduled Tasks
 # ---------------
@@ -185,3 +205,4 @@ app_license = "MIT"
 # auth_hooks = [
 #	"admin_iiti.auth.validate"
 # ]
+update_website_context = "admin_iiti.overrides.update_website_context"

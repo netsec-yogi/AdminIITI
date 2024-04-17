@@ -1,0 +1,82 @@
+{
+ "actions": [],
+ "autoname": "autoincrement",
+ "creation": "2023-01-03 15:11:09.476316",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "position",
+  "leave_type",
+  "first_recommender",
+  "second_recommender",
+  "third_recommender",
+  "approver"
+ ],
+ "fields": [
+  {
+   "fieldname": "position",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Position",
+   "options": "Employee Position"
+  },
+  {
+   "fieldname": "leave_type",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Leave Type",
+   "options": "Leave type options"
+  },
+  {
+   "fieldname": "first_recommender",
+   "fieldtype": "Link",
+   "label": "First Recommender",
+   "options": "Employee Position"
+  },
+  {
+   "fieldname": "second_recommender",
+   "fieldtype": "Link",
+   "label": "Second Recommender",
+   "options": "Employee Position"
+  },
+  {
+   "fieldname": "third_recommender",
+   "fieldtype": "Link",
+   "label": "Third Recommender",
+   "options": "Employee Position"
+  },
+  {
+   "fieldname": "approver",
+   "fieldtype": "Link",
+   "label": "Approver",
+   "options": "Employee Position"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2022-11-14 02:55:44.351558",
+ "modified_by": "Administrator",
+ "module": "Admin IITI",
+ "name": "Leave Authority",
+ "naming_rule": "Autoincrement",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

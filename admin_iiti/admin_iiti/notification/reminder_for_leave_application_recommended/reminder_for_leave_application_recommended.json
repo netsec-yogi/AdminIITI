@@ -1,0 +1,33 @@
+{
+ "attach_print": 0,
+ "channel": "Email",
+ "condition": "doc.docstatus == 0 and doc.total_recommender == 1 and doc.status != 'Recommended'",
+ "creation": "2023-02-14 10:12:35.243198",
+ "date_changed": "from_date",
+ "days_in_advance": 1,
+ "docstatus": 0,
+ "doctype": "Notification",
+ "document_type": "Leave Application",
+ "enabled": 1,
+ "event": "Days Before",
+ "idx": 0,
+ "is_standard": 1,
+ "message": "<!-- <table class=\"panel-header\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">\n\t<tr>\n\t\t<td width=\"15\"></td>\n\t\t<td>\n\t\t\n\t\t</td>\n\t\t<td width=\"15\"></td>\n\t</tr>\n\t<tr height=\"10\"></tr>\n</table> -->\n\n<div class=\"text-medium text-muted\" style=\"color:#202124;\">\n\t<h2>{{_(\"Reminder to recommend The Leave Appliction:\")}}</h2>\n</div>\n\n<table class=\"panel-body\" border=\"\" cellpadding=\"0\" cellspacing=\"\" width=\"100%\">\n\t<tr height=\"10\">\n        <td> <b>{{_(\"Employee\")}}: </b></td>\n        <td>{{doc.employee_name}}</td>\n    </tr>\n    <tr height=\"10\">\n        <td> <b>{{_(\"Leave Type\")}}: </b></td>\n        <td>{{doc.leave_type}}</td>\n    </tr>\n    <tr height=\"10\">\n        <td> <b>{{_(\"From Date\")}}: </b></td>\n        <td>{{doc.from_date}}</td>\n    </tr>\n    <tr height=\"10\">\n        <td> <b>{{_(\"To Date\")}}: </b></td>\n        <td>{{doc.to_date}}</td>\n    </tr>\n    <tr height=\"10\">\n        <td> <b>{{_(\"Total Leave Days\")}}: </b></td>\n        <td>{{doc.total_leave_days}}</td>\n    </tr>\n    <tr>\n        <td><b>{{_(\"Status\")}}: </b></td>\n        <td>{{doc.status}}</td>\n    </tr>\n    {% set doc_link = frappe.utils.get_url_to_form('Leave Application', doc.name) %}\n\t<!-- <tr>\n\t\t<td width=\"15\"></td>\n\t\t<td>\n\t\t\t<div>\n\t\t\t\t<ul class=\"list-unstyled\" style=\"line-height: 1.7\">\n\t\t\t\t\t<li><b>{{_(\"Employee\")}}: </b>{{ doc.employee }} - {{ doc.employee_name }}</li>\n\t\t\t\t\t<li><b>{{_(\"Date\")}}: </b>{{ frappe.utils.formatdate(doc.date) }}</li>\n\t\t\t\t\t<li><b>{{_(\"Interviewers\")}}:</b> </li>\n\t\t\t\t\t{% for entry in doc.interviewers %}\n\t\t\t\t\t\t<ul>\n\t\t\t\t\t\t\t<li>{{ entry.user }}</li>\n\t\t\t\t\t\t</ul>\n\t\t\t\t\t{% endfor %}\n\t\t\t\t\t<li><b>{{ _(\"Interview Document\") }}:</b> {{ frappe.utils.get_link_to_form(doc.doctype, doc.name) }}</li>\n\t\t\t\t</ul>\n\t\t\t</div>\n\t\t</td>\n\t\t<td width=\"15\"></td>\n\t</tr> -->\n</table>\n<div class=\"text-medium text-muted\" style=\"color:#202124;\">\n\t<h2>Please click on the button below and recommend or Not recommend the leave application</h2>\n</div>\n<div class=\"col-md-6\">\n<a href=\"{{doc_link}}\" style=\"color:#fff;background-color:#2490ef;border:1px solid;border-color:transparent;border-radius:6px;display:inline-block;font-size:13px;line-height:20px;padding:4px 20px;text-decoration:none\" bgcolor=\"#2490EF\" target=\"_blank\" >Open Now</a>\n\n</div>",
+ "modified": "2023-02-14 10:19:44.045610",
+ "modified_by": "Administrator",
+ "module": "Admin IITI",
+ "name": "Reminder For leave Application Recommended",
+ "owner": "Administrator",
+ "property_value": "send",
+ "recipients": [
+  {
+   "receiver_by_document_field": "leave_recommender"
+  }
+ ],
+ "send_system_notification": 1,
+ "send_to_all_assignees": 1,
+ "sender": "ERP IIT Indore",
+ "sender_email": "erp.notifications@iiti.ac.in",
+ "set_property_after_alert": "description",
+ "subject": "Reminder to Recommended the Leave Application ({{doc.employee_name}})"
+}

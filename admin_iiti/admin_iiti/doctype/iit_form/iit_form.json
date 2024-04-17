@@ -1,0 +1,452 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2023-06-01 17:36:43.462174",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "form_list",
+  "column_break_2",
+  "naming_series",
+  "section_break_2",
+  "applicant_name",
+  "father_name",
+  "mather_name",
+  "program",
+  "mobile",
+  "purpose_of_certificate",
+  "column_break_8",
+  "branch",
+  "year",
+  "semester",
+  "email_id",
+  "section_break_14",
+  "designation",
+  "department",
+  "date_of_joining",
+  "to_be_added_in_group",
+  "column_break_18",
+  "is_depended",
+  "depended_name",
+  "employee_id",
+  "pay_level",
+  "pay_scale",
+  "category_of_applicant",
+  "date_of_birth",
+  "existing_email_id",
+  "other_information",
+  "address_details_section",
+  "present_address",
+  "column_break_24",
+  "permanent_address",
+  "section_break_30",
+  "age",
+  "place_of_visit",
+  "column_break_33",
+  "purpose_of_visit",
+  "period_of_visit_section",
+  "form_date",
+  "column_break_37",
+  "to_date",
+  "section_break_39",
+  "air_tickets_details",
+  "section_break_46",
+  "selection__designation",
+  "column_break_48",
+  "selection_at",
+  "approver_users_section",
+  "approvers",
+  "status",
+  "approved_count",
+  "doc_approved_date",
+  "follow_via_email",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "form_list",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Form List",
+   "options": "Form List"
+  },
+  {
+   "depends_on": "eval:in_list([\"Bonafide Certificate / NOC\",\"Identity Certificate For Govt. Employee\",\"NOC-Passport\"],doc.form_list)",
+   "fieldname": "father_name",
+   "fieldtype": "Data",
+   "label": "Father Name"
+  },
+  {
+   "fieldname": "section_break_2",
+   "fieldtype": "Section Break"
+  },
+  {
+   "depends_on": "eval:in_list([\"Bonafide Certificate / NOC\",\"Official / E-Mail ID Opening\",\"Address Proof Certificate\",\"Request For Booking Air Tickets\",\"Identity Certificate For Govt. Employee\",\"No Object Certificate\",\"NOC-Passport\"],doc.form_list)",
+   "fieldname": "applicant_name",
+   "fieldtype": "Data",
+   "in_filter": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Applicant Name"
+  },
+  {
+   "fieldname": "mather_name",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Mather Name"
+  },
+  {
+   "depends_on": "eval:in_list([\"Bonafide Certificate / NOC\"],doc.form_list)",
+   "fieldname": "program",
+   "fieldtype": "Link",
+   "label": "Program",
+   "options": "Custom Program"
+  },
+  {
+   "depends_on": "eval:in_list([\"Bonafide Certificate / NOC\",\"Request For Booking Air Tickets\",\"Official / E-Mail ID Opening\"],doc.form_list)",
+   "fieldname": "mobile",
+   "fieldtype": "Data",
+   "label": "Mobile"
+  },
+  {
+   "fieldname": "column_break_8",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:in_list([\"Bonafide Certificate / NOC\"],doc.form_list)",
+   "fieldname": "branch",
+   "fieldtype": "Data",
+   "label": "Branch"
+  },
+  {
+   "depends_on": "eval:in_list([\"Bonafide Certificate / NOC\"],doc.form_list)",
+   "fieldname": "year",
+   "fieldtype": "Link",
+   "label": "Year",
+   "options": "Admission Year"
+  },
+  {
+   "depends_on": "eval:in_list([\"Bonafide Certificate / NOC\"],doc.form_list)",
+   "fieldname": "semester",
+   "fieldtype": "Link",
+   "label": "Semester",
+   "options": "Academic Term"
+  },
+  {
+   "depends_on": "eval:in_list([\"Bonafide Certificate / NOC\"],doc.form_list)",
+   "fieldname": "purpose_of_certificate",
+   "fieldtype": "Select",
+   "label": "Purpose of certificate",
+   "options": "\nBonafide Certificate\nBonafide with Residential Certificate\nBonafide for Passport/Visa\nBonafide for Summer Internship\nMisl.(To be specified)"
+  },
+  {
+   "depends_on": "eval:in_list([\"Bonafide Certificate / NOC\"],doc.form_list)",
+   "fieldname": "email_id",
+   "fieldtype": "Data",
+   "label": "Email ID"
+  },
+  {
+   "fieldname": "section_break_14",
+   "fieldtype": "Section Break"
+  },
+  {
+   "depends_on": "eval:in_list([\"Official / E-Mail ID Opening\",\"Request For Booking Air Tickets\",\"Address Proof Certificate\",\"Identity Certificate For Govt. Employee\",\"No Object Certificate\",\"NOC-Passport\"],doc.form_list)",
+   "fieldname": "designation",
+   "fieldtype": "Link",
+   "label": "Designation",
+   "options": "Designation"
+  },
+  {
+   "depends_on": "eval:in_list([\"Official / E-Mail ID Opening\",\"Request For Booking Air Tickets\",\"Address Proof Certificate\",\"Identity Certificate For Govt. Employee\",\"No Object Certificate\",\"NOC-Passport\"],doc.form_list)",
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "label": "Department",
+   "options": "Department"
+  },
+  {
+   "depends_on": "eval:in_list([\"Official / E-Mail ID Opening\",\"Address Proof Certificate\",\"Identity Certificate For Govt. Employee\",\"No Object Certificate\",\"NOC-Passport\"],doc.form_list)",
+   "fieldname": "date_of_joining",
+   "fieldtype": "Date",
+   "label": "Date of Joining"
+  },
+  {
+   "fieldname": "column_break_18",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:in_list([\"Official / E-Mail ID Opening\"],doc.form_list)",
+   "fieldname": "category_of_applicant",
+   "fieldtype": "Select",
+   "label": "Category of Applicant",
+   "options": "\nStaff\nFaculty\nContractual\nStudent\nResearch"
+  },
+  {
+   "depends_on": "eval:in_list([\"Official / E-Mail ID Opening\",\"Address Proof Certificate\"],doc.form_list)",
+   "fieldname": "date_of_birth",
+   "fieldtype": "Date",
+   "label": "Date Of Birth"
+  },
+  {
+   "depends_on": "eval:in_list([\"Official / E-Mail ID Opening\"],doc.form_list)",
+   "fieldname": "existing_email_id",
+   "fieldtype": "Data",
+   "label": "Existing Email ID"
+  },
+  {
+   "depends_on": "eval:in_list([\"Address Proof Certificate\"],doc.form_list)",
+   "fieldname": "address_details_section",
+   "fieldtype": "Section Break",
+   "label": "Address Details"
+  },
+  {
+   "depends_on": "eval:in_list([\"Address Proof Certificate\"],doc.form_list)",
+   "fieldname": "present_address",
+   "fieldtype": "Small Text",
+   "label": "Present Address"
+  },
+  {
+   "fieldname": "column_break_24",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:in_list([\"Address Proof Certificate\"],doc.form_list)",
+   "fieldname": "permanent_address",
+   "fieldtype": "Small Text",
+   "label": "Permanent Address "
+  },
+  {
+   "fieldname": "approver_users_section",
+   "fieldtype": "Section Break",
+   "label": "Approver Users"
+  },
+  {
+   "fieldname": "approvers",
+   "fieldtype": "Table",
+   "label": "Approvers",
+   "options": "Approvers"
+  },
+  {
+   "depends_on": "eval:in_list([\"Official / E-Mail ID Opening\"],doc.form_list)",
+   "fieldname": "to_be_added_in_group",
+   "fieldtype": "Select",
+   "label": "To be added in Group",
+   "options": "All IITI\nAll Faculty\nAll Admin\nAll Lab\nAny Other"
+  },
+  {
+   "depends_on": "eval:in_list([\"Official / E-Mail ID Opening\"],doc.form_list)",
+   "fieldname": "other_information",
+   "fieldtype": "Small Text",
+   "label": "Other Information",
+   "max_height": "30px",
+   "width": "40px"
+  },
+  {
+   "default": "Open",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Status",
+   "options": "Open\nRecommended\nApproved\nReject"
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Naming Series",
+   "options": "IITI/Admin/PNT-.YYYY.-\nIIT-FR-.YYYY.-"
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "IIT Form",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_30",
+   "fieldtype": "Section Break"
+  },
+  {
+   "depends_on": "eval:in_list([\"Request For Booking Air Tickets\"],doc.form_list)",
+   "fieldname": "age",
+   "fieldtype": "Data",
+   "label": "Age"
+  },
+  {
+   "depends_on": "eval:in_list([\"Request For Booking Air Tickets\"],doc.form_list)",
+   "fieldname": "place_of_visit",
+   "fieldtype": "Data",
+   "label": "Place of visit"
+  },
+  {
+   "fieldname": "column_break_33",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:in_list([\"Request For Booking Air Tickets\"],doc.form_list)",
+   "fieldname": "purpose_of_visit",
+   "fieldtype": "Small Text",
+   "label": "Purpose of visit "
+  },
+  {
+   "depends_on": "eval:in_list([\"Request For Booking Air Tickets\"],doc.form_list)",
+   "fieldname": "period_of_visit_section",
+   "fieldtype": "Section Break",
+   "label": "Period of visit"
+  },
+  {
+   "depends_on": "eval:in_list([\"Request For Booking Air Tickets\"],doc.form_list)",
+   "fieldname": "form_date",
+   "fieldtype": "Date",
+   "label": "Form Date"
+  },
+  {
+   "fieldname": "column_break_37",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:in_list([\"Request For Booking Air Tickets\"],doc.form_list)",
+   "fieldname": "to_date",
+   "fieldtype": "Date",
+   "label": "To Date"
+  },
+  {
+   "depends_on": "eval:in_list([\"Request For Booking Air Tickets\"],doc.form_list)",
+   "fieldname": "section_break_39",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "air_tickets_details",
+   "fieldtype": "Table",
+   "label": "Air Tickets Details",
+   "options": "Air Tickets Details"
+  },
+  {
+   "default": "0",
+   "fieldname": "approved_count",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "approved_count"
+  },
+  {
+   "fieldname": "doc_approved_date",
+   "fieldtype": "Datetime",
+   "hidden": 1,
+   "label": "Doc Approved Date"
+  },
+  {
+   "default": "1",
+   "fieldname": "follow_via_email",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "follow_via_email"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:in_list([\"Address Proof Certificate\",\"Identity Certificate For Govt. Employee\"],doc.form_list)",
+   "fieldname": "is_depended",
+   "fieldtype": "Check",
+   "label": "Is Depended"
+  },
+  {
+   "depends_on": "eval:doc.is_depended",
+   "fieldname": "depended_name",
+   "fieldtype": "Data",
+   "label": "Depended Name"
+  },
+  {
+   "depends_on": "eval:in_list([\"Address Proof Certificate\",\"No Object Certificate\"],doc.form_list)",
+   "fieldname": "pay_level",
+   "fieldtype": "Link",
+   "label": "Pay Level",
+   "options": "Pay Level"
+  },
+  {
+   "depends_on": "eval:in_list([\"Address Proof Certificate\",\"No Object Certificate\"],doc.form_list)",
+   "fieldname": "pay_scale",
+   "fieldtype": "Data",
+   "label": "Pay Scale"
+  },
+  {
+   "depends_on": "eval:in_list([\"Identity Certificate For Govt. Employee\"],doc.form_list)",
+   "fieldname": "employee_id",
+   "fieldtype": "Data",
+   "label": "Employee ID"
+  },
+  {
+   "fieldname": "section_break_46",
+   "fieldtype": "Section Break"
+  },
+  {
+   "depends_on": "eval:in_list([\"No Object Certificate\"],doc.form_list)",
+   "fieldname": "selection__designation",
+   "fieldtype": "Link",
+   "label": "Selection  Designation",
+   "options": "Designation"
+  },
+  {
+   "fieldname": "column_break_48",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:in_list([\"No Object Certificate\"],doc.form_list)",
+   "fieldname": "selection_at",
+   "fieldtype": "Data",
+   "label": "Selection At"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2023-06-06 11:30:21.210787",
+ "modified_by": "Administrator",
+ "module": "Admin IITI",
+ "name": "IIT Form",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [
+  {
+   "color": "Orange",
+   "title": "Open"
+  },
+  {
+   "color": "Yellow",
+   "title": "Recommended"
+  },
+  {
+   "color": "Blue",
+   "title": "Approved"
+  },
+  {
+   "color": "Red",
+   "title": "Rejected"
+  }
+ ],
+ "track_changes": 1,
+ "track_views": 1
+}

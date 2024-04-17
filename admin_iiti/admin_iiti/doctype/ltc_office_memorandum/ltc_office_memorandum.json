@@ -1,0 +1,197 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:ltc_reference_number",
+ "creation": "2023-06-26 15:46:29.340943",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "ltc_reference_number",
+  "column_break_2",
+  "ltc_details_section",
+  "employee_name",
+  "department",
+  "designation",
+  "specify_whether",
+  "date_of_onward_journey",
+  "column_break_8",
+  "application_date",
+  "destination",
+  "nearest_railway_station",
+  "block_year",
+  "date_of_return_journey",
+  "section_break_16",
+  "ltc_claimed",
+  "admin_section_section",
+  "entitlement",
+  "encashment_of_el",
+  "column_break_19",
+  "advance_requested"
+ ],
+ "fields": [
+  {
+   "fieldname": "ltc_reference_number",
+   "fieldtype": "Link",
+   "in_standard_filter": 1,
+   "label": "LTC Reference Number ",
+   "options": "LTC Request",
+   "unique": 1
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "ltc_details_section",
+   "fieldtype": "Section Break",
+   "label": "LTC Details"
+  },
+  {
+   "fetch_from": "ltc_reference_number.employee_name",
+   "fieldname": "employee_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Employee Name"
+  },
+  {
+   "fetch_from": "ltc_reference_number.department",
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "in_standard_filter": 1,
+   "label": "Department",
+   "options": "Department"
+  },
+  {
+   "fieldname": "designation",
+   "fieldtype": "Link",
+   "label": "Designation",
+   "options": "Designation"
+  },
+  {
+   "fetch_from": "ltc_reference_number.specify_whether",
+   "fieldname": "specify_whether",
+   "fieldtype": "Select",
+   "label": "Specify Whether",
+   "options": "\nHome Town\nAny Where"
+  },
+  {
+   "fetch_from": "ltc_reference_number.departure_date",
+   "fieldname": "date_of_onward_journey",
+   "fieldtype": "Date",
+   "label": "Date Of Onward Journey"
+  },
+  {
+   "fieldname": "column_break_8",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "application_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Application Date"
+  },
+  {
+   "fetch_from": "ltc_reference_number.destination",
+   "fieldname": "destination",
+   "fieldtype": "Data",
+   "label": "Destination"
+  },
+  {
+   "fetch_from": "ltc_reference_number.nearest_railway",
+   "fieldname": "nearest_railway_station",
+   "fieldtype": "Data",
+   "label": "Nearest Railway Station"
+  },
+  {
+   "fetch_from": "ltc_reference_number.block_year",
+   "fieldname": "block_year",
+   "fieldtype": "Data",
+   "label": "Block Year"
+  },
+  {
+   "fetch_from": "ltc_reference_number.arrival_date",
+   "fieldname": "date_of_return_journey",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Date Of Return Journey"
+  },
+  {
+   "fieldname": "section_break_16",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "ltc_claimed",
+   "fieldtype": "Table",
+   "label": "LTC Claimed",
+   "options": "LTC Claimed Details"
+  },
+  {
+   "fieldname": "admin_section_section",
+   "fieldtype": "Section Break",
+   "label": "Admin Section"
+  },
+  {
+   "fieldname": "entitlement",
+   "fieldtype": "Data",
+   "label": "Entitlement"
+  },
+  {
+   "fetch_from": "ltc_reference_number.encashment_days",
+   "fieldname": "encashment_of_el",
+   "fieldtype": "Data",
+   "label": "Encashment Of EL"
+  },
+  {
+   "fieldname": "column_break_19",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "ltc_reference_number.ltc_advance_amount",
+   "fieldname": "advance_requested",
+   "fieldtype": "Float",
+   "label": "Advance Requested "
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-01-30 15:24:47.735225",
+ "modified_by": "Administrator",
+ "module": "Admin IITI",
+ "name": "LTC Office Memorandum",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR Dealing Assistant",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1,
+ "track_views": 1
+}
