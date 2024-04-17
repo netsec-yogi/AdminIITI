@@ -211,7 +211,6 @@
   {
    "fieldname": "ltc_claimed",
    "fieldtype": "Table",
-   "label": "LTC Claimed",
    "options": "LTC Claimed Details",
    "reqd": 1
   },
@@ -413,7 +412,8 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-07-03 16:04:16.996420",
+ "make_attachments_public": 1,
+ "modified": "2024-04-17 11:14:49.325547",
  "modified_by": "Administrator",
  "module": "Admin IITI",
  "name": "LTC Request",

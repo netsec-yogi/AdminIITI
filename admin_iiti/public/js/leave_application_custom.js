@@ -7,6 +7,7 @@ frappe.ui.form.on("Leave Application", {
 			})
 			
 		}
+		//frm.trigger("validation_check");
 	// 	frm.trigger("leave_approver");
      },
 	refresh:function(frm){
@@ -25,9 +26,12 @@ frappe.ui.form.on("Leave Application", {
 			LTC(frm)
 			
 		});
-		if(frappe.session.user == 'hrmanager@iiti.ac.in'){
-			frm.set_df_property('status', 'options', ['Open','Approved','Cancelled'])
+		if(frappe.session.user == 'hrmanager@iiti.ac.in' && frm.doc.status != 'Cancelled'){
+			frm.set_df_property('status', 'options', ['Open','Approved','Cancelled','Recommended'])
 			frm.enable_save();
+			frm.add_custom_button(__('Cancel Leave'), 
+				() => cancel_leave_application(frm)).addClass("btn-danger")
+				.css({ 'color': '#ffffff', 'font-weight': 'bold', 'background-color': '#17a2b8' });
 		}else{
 			frm.disable_save();
 		}
@@ -275,12 +279,12 @@ frappe.ui.form.on("Leave Application", {
 			// this is used to html template code render for  leave application dashborad call 
 			$("div").remove(".form-dashboard-section.custom");
 			var data = leave_details
-			var template = '{% if not jQuery.isEmptyObject(data) %}<table class="table table-bordered small"><thead><tr><th style="width: 16%">{{ __("Leave Type") }}</th><th style="width: 16%" class="text-right">{{ __("Leave Availed") }}</th><th style="width: 16%" class="text-right">{{ __("Pending Leave") }}</th><th style="width: 16%" class="text-right">{{ __("Leave Balance") }}</th></tr></thead><tbody>{% for(const [key, value] of Object.entries(data)) { %}<tr><td> {%= key %} </td><td class="text-right"> {%= value["leaves_taken"] %} </td><td class="text-right"> {%= value["pending_leaves"] %} </td><td class="text-right"> {%= value["remaining_leaves"] %} </td></tr>{% } %}</tbody></table>{% else %}<p style="margin-top: 30px;"> No Leave has been allocated. </p>{% endif %}'
+			var template = '{% if not jQuery.isEmptyObject(data) %}<table class="table table-bordered small"><thead><tr><th style="width: 16%">{{ __("Leave Type") }}</th><th style="width: 16%" class="text-right">{{ __("Leave Balance") }}</th></tr></thead><tbody>{% for(const [key, value] of Object.entries(data)) { %}<tr><td> {%= key %} </td><td class="text-right"> {%= value["remaining_leaves"] %} </td></tr>{% } %}</tbody></table>{% else %}<p style="margin-top: 30px;"> No Leave has been allocated. </p>{% endif %}'
 			frm.dashboard.add_section(
 				frappe.render_template(template, {
 					data: leave_details
 				}),
-				__("Balanced Leave")
+				__("Leave Balanced")
 			);
 			frm.dashboard.show();
 			let allowed_leave_types = Object.keys(leave_details);
@@ -650,7 +654,8 @@ frappe.ui.form.on("Leave Application", {
 				}
 			}
 		});
-	},leave_recommender_second:function(frm){
+	},
+	leave_recommender_second:function(frm){
 		if(frm.doc.leave_recommender){
 			if(frm.doc.leave_recommender_second == frm.doc.leave_recommender){
 				frappe.msgprint("invalid data filled");
@@ -679,6 +684,12 @@ frappe.ui.form.on("Leave Application", {
 		}
 	},
 	leave_recommender:function(frm){
+		if(frm.doc.leave_recommender){
+			if(frm.doc.leave_recommender == frm.doc.leave_approver){
+				frappe.msgprint("invalid data filled");
+				frm.set_value("leave_recommender", "")
+			}
+		}
 		if(frm.doc.leave_recommender_second){
 			if(frm.doc.leave_recommender_second == frm.doc.leave_recommender){
 				frappe.msgprint("invalid data filled");
@@ -689,6 +700,18 @@ frappe.ui.form.on("Leave Application", {
 			if(frm.doc.leave_recommender_third == frm.doc.leave_recommender){
 				frappe.msgprint("invalid data filled");
 				frm.set_value("leave_recommender", "")
+			}
+		}
+	},
+	leave_approver:function(frm){
+		if(frm.doc.leave_approver){
+			if(frm.doc.leave_approver == frm.doc.leave_recommender){
+				frappe.msgprint("you can select the same leave recommender user name in leave approver");
+				frm.set_value('leave_recommender','');
+				frm.set_value('leave_approver','');
+				frm.set_value('leave_approver_name','');
+			}else{
+	
 			}
 		}
 	}

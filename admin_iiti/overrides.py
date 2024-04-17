@@ -119,9 +119,12 @@ class CustomLeaveApplication(Document):
                 is_lwp=lwp,
                 holiday_list=get_holiday_list_for_employee(self.employee, raise_exception=raise_exception) or ''
             )
-            create_leave_ledger_entry(self, args, submit)
             if self.leave_type_name == 'Commuted Leave':
                 HPL_balance_minus(self)
+            elif self.leave_type_name == 'Half Paid Leave':
+                HPL_balance_minus(self)
+            else:
+                create_leave_ledger_entry(self, args, submit)
 
     def validate_recommender_entry(self):
         if self.leave_recommender and not self.leave_recommender_second and not self.leave_recommender_third:

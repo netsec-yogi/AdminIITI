@@ -15,6 +15,9 @@ frappe.listview_settings['LTC Request'] = {
 		}else if (doc.status === "Recommended"){
 			return [__("Recommended"), "green", "status,=,Recommended"];
 		}
+		else if (doc.status === "Rejected"){
+			return [__("Rejected"), "red", "status,=,Rejected"];
+		}
         else {
 			return [__("Open"), "red", "status,=,Open"];
 		}

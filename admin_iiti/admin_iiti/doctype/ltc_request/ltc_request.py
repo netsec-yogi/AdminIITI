@@ -36,7 +36,7 @@ from frappe.model.naming import getseries
 class LTCRequest(Document):
     def autoname(self):
         # p:this function used for create the custom auto name series
-        prefix = 'p-{}-'.format(self.employee)
+        prefix = 'p-{}-'.format('IIT-Admin-PNT-2024-')
         x = getseries(prefix, 4)
         
         #frappe.throw(frappe.as_json(x))

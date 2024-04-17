@@ -18,7 +18,7 @@
    "fieldname": "family_members",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Family Members"
+   "label": " Name of the person availed LTC"
   },
   {
    "fieldname": "age",
@@ -48,7 +48,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-11-14 02:55:11.203946",
+ "modified": "2024-01-05 16:52:23.700800",
  "modified_by": "Administrator",
  "module": "Admin IITI",
  "name": "LTC Claimed Details",
