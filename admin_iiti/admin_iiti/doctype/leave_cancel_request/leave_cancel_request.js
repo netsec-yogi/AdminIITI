@@ -11,6 +11,7 @@ frappe.ui.form.on('Leave cancel Request', {
 		}
 		if(frappe.session.user == 'hrmanager@iiti.ac.in'){
 			frm.toggle_display("follow_via_email",true);
+			cur_frm.set_df_property("total_leave_days","read_only",0);
 		}
 	},
 	onload: function(frm) {
@@ -24,6 +25,7 @@ frappe.ui.form.on('Leave cancel Request', {
 				}
 				if(frappe.session.user == 'hrmanager@iiti.ac.in'){
 					frm.toggle_display("follow_via_email",true);
+					cur_frm.set_df_property("total_leave_days","read_only",0);
 					frm.set_df_property('status', 'options', ['Open', 'Approved', 'Not Approved'])
 				}
 			}
@@ -42,4 +44,14 @@ frappe.ui.form.on('Leave cancel Request', {
 			}
 		}
 	},
+	leave_application : function(frm) {
+		if (frm.doc.leave_application) {			
+			frappe.db.get_value('Leave Application', {'name': frm.doc.leave_application}, ['total_leave_days','from_date','to_date'], (d) =>{
+				frm.set_value("total_leave_days",d.total_leave_days);
+				frm.set_value("from_date",d.from_date);
+				frm.set_value("to_date",d.to_date);
+			})
+			
+		}
+    },
 });

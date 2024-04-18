@@ -23,7 +23,6 @@
   "approver",
   "status",
   "follow_via_email",
-  "amended_from",
   "amended_from"
  ],
  "fields": [
@@ -73,19 +72,16 @@
    "unique": 1
   },
   {
-   "fetch_from": "leave_application.from_date",
    "fieldname": "from_date",
-   "fieldtype": "Data",
+   "fieldtype": "Date",
    "label": "From Date"
   },
   {
-   "fetch_from": "leave_application.to_date",
    "fieldname": "to_date",
-   "fieldtype": "Data",
+   "fieldtype": "Date",
    "label": "To date"
   },
   {
-   "fetch_from": "leave_application.total_leave_days",
    "fieldname": "total_leave_days",
    "fieldtype": "Data",
    "label": "Total Leave Days",
@@ -144,7 +140,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-02-04 11:40:41.051513",
+ "modified": "2024-04-18 12:54:34.636916",
  "modified_by": "Administrator",
  "module": "Admin IITI",
  "name": "Leave cancel Request",
