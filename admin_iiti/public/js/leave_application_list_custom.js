@@ -25,6 +25,9 @@ if (frappe.user.has_role('Leave Approver')) {
 			else if (doc.status === "Recommended") {
 				return [__("Recommended"), "yellow", "status,=,Recommended"];
 			}
+			else if (doc.status === "Amended") {
+				return [__("Amended"), "blue", "status,=,Amended"];
+			}
 			else if (doc.status === "Cancelled") {
 				return [__("Cancelled"), "red", "status,=,Cancelled"];
 			}

@@ -9,6 +9,7 @@
  "field_order": [
   "title",
   "name1",
+  "user",
   "upload"
  ],
  "fields": [
@@ -26,11 +27,17 @@
    "fieldname": "upload",
    "fieldtype": "Attach",
    "label": "upload"
+  },
+  {
+   "fieldname": "user",
+   "fieldtype": "Link",
+   "label": "User",
+   "options": "User"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-10-09 16:12:38.519965",
+ "modified": "2024-04-29 13:00:46.804859",
  "modified_by": "Administrator",
  "module": "Admin IITI",
  "name": "TestDoc",
