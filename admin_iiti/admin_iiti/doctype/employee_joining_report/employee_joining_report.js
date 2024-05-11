@@ -10,95 +10,149 @@ frappe.ui.form.on('Employee Joining Report', {
 				frm.set_value('employee', perm['Employee'].map(perm_doc => perm_doc.doc)[0]);
 			}
 		}
+		if (frm.is_new()) {
+			
+		}else if(!frm.is_new()){
+			if(frappe.session.user == 'hrmanager@iiti.ac.in'){
+				frm.toggle_display("status",true);
+				frm.toggle_display("follow_via_email",true);
+				cur_frm.set_df_property("total_leave_days","read_only",0);
+				frm.set_df_property('status', 'options', ['Open', 'Approved', 'Not Approved'])
+			}
+			if (frm.doc.approver == frappe.session.user && frm.doc.status == 'Open'){
+				frm.disable_form();
+				frm.add_custom_button(__('Approve'), function () {
+					let action_type = 'Approved';
+					joining_report_status_update(frm,action_type);
+				}).addClass("btn-info").css({ 'color': '#ffffff', 'font-weight': 'bold', 'background-color': '#6495ed' });
+
+				frm.add_custom_button(__('Reject'), function () {
+					let action_type = 'Rejected';
+					joining_report_status_update(frm, action_type);
+	
+				}).addClass("btn-danger").css({ 'color': '#ffffff', 'font-weight': 'bold', 'background-color': 'red' })
+			}
+			if(frm.doc.approver == frappe.session.user && frm.doc.status == 'Approved'){
+				frm.add_custom_button(__('Approved'), function () {
+					frappe.msgprint('Joining Report already Approved');
+				}).addClass("btn-info").css({ 'color': '#ffffff', 'font-weight': 'bold', 'background-color': '#1eb817ab' })
+			}
+			//p: reporting date validation added 
+
+			if(frm.doc.reporting_date){
+				var from_date = new Date(frm.doc.reporting_date);
+				var day = from_date.getDate();
+				var year = from_date.getFullYear();
+				var month = from_date.getMonth()+1;
+				console.log(frm.doc.reporting_date);
+				console.log(frm.fields_dict.reporting_date.datepicker);
+				frm.fields_dict.reporting_date.datepicker.update({minDate: new Date(year, month - 1, day)})
+			}
+		}
 	},
 	onload: function(frm) {
-		//console.log(frm);
-		//set_status open for employee();
 		if (frm.is_new()) {
-			frm.set_df_property('status', 'options', ['Open','Cancel'])
+			
 		}else if(!frm.is_new()){
-			if(frappe.session.user==frm.doc.owner){
-					frm.disable_form();
-					frm.set_df_property('status', 'options', ['Open','Cancel'])
-			}else if(frappe.session.user==frm.doc.approver){
-				frm.set_df_property('status', 'options', ['Open','Approved','Not Approved'])
+			if(frappe.session.user == 'hrmanager@iiti.ac.in'){
+				frm.toggle_display("status",true);
+				frm.toggle_display("follow_via_email",true);
+				cur_frm.set_df_property("total_leave_days","read_only",0);
+				frm.set_df_property('status', 'options', ['Open', 'Approved', 'Not Approved'])
+			}
+			if (frm.doc.approver == frappe.session.user && frm.doc.status == 'Open'){
+				frm.disable_form();
+				frm.add_custom_button(__('Approve'), function () {
+					let action_type = 'Approved';
+					joining_report_status_update(frm,action_type);
+				}).addClass("btn-info").css({ 'color': '#ffffff', 'font-weight': 'bold', 'background-color': '#6495ed' });
+
+				frm.add_custom_button(__('Reject'), function () {
+					let action_type = 'Rejected';
+					joining_report_status_update(frm, action_type);
+	
+				}).addClass("btn-danger").css({ 'color': '#ffffff', 'font-weight': 'bold', 'background-color': 'red' });
+
+				if(frm.doc.approver == frappe.session.user && frm.doc.status == 'Approved'){
+					frm.add_custom_button(__('Approved'), function () {
+						frappe.msgprint('Joining Report already Approved');
+					}).addClass("btn-info").css({ 'color': '#ffffff', 'font-weight': 'bold', 'background-color': '#1eb817ab' })
+				}
 			}
 		}
 
-        //filter for leave_application field only show approved applications
-		cur_frm.fields_dict.leave_application.get_query = function(doc) {
-			return {
-				filters: {
-					status: 'Approved',
-					employee : doc.employee
-				},
-				order_by: 'posting_date desc',
-			}
-		}
-        if(frm.doc.employee!=''){
-			var employee = frm.doc.employee;
-			var employee_detail = get_emp_detail(employee);
-			var department = employee_detail.department;
-			// var leave_approver = get_employee_hod(department,'HOD','HOD');
-			// cur_frm.set_value('approver',leave_approver);
-		}
 	},
-	employee:function(frm){
-		if(frm.doc.employee!=''){
-			var employee = frm.doc.employee;
-			var employee_detail = get_emp_detail(employee);
-			var department = employee_detail.department;
-			// var leave_approver = get_employee_hod(department,'HOD','HOD');
-			// cur_frm.set_value('approver',leave_approver);
-	    }
-	},
-	// approver:function (frm) {
-	//
-	//
-	// }
 	setup: function(frm) {
 		frm.set_query("approver", function() {
 			return {
 				query: 'admin_iiti.overrides.get_approvers',
 			};
 		});
-	},
-});
-
-function get_emp_detail(employee){
-	var emp_detail = [];
-	frappe.call({
-		method: "frappe.client.get_value",
-		args: {
-			doctype: "Employee",
-			filters: {
-				"name":employee,
-			},
-			fieldname: ["*"]
-		},
-		async: false,
-		callback: function(r){
-	        emp_detail=r.message;
-		} 
-	});
-    return emp_detail;
-}
-
-function get_employee_hod(emp_main_department,position_department,position){
-    var email = "";
-	frappe.call({
-		method: "admin_iiti.overrides.get_employee_by_position",
-		async: false,
-		args: {
-			"postion_department": position_department,
-			"position":position,
-			"emp_main_department":emp_main_department
-		},
-		callback: function (r) {
-		     if(r.message.length>0){
-                email = r.message[0].user_id;
-			 }
+		let data = get_leave_data(frm);
+        //filter for leave_application field only show approved applications
+		cur_frm.fields_dict.leave_application.get_query = function(doc) {
+			return {
+				filters: {
+					name : ['IN',data]
+				},
+				order_by: 'posting_date desc',
+			}
 		}
+		
+		
+	},
+	leave_application:function(frm){
+		if (frm.doc.leave_application){
+			frappe.call({
+				method: "frappe.client.get_value",
+				args: {
+					doctype: "Leave Application",
+					filters: {
+						"name":frm.doc.leave_application,
+					},
+					fieldname: ["*"]
+				},
+				async: false,
+				callback: function(r){
+					let data = r.message;
+					frm.set_value("approver",data.leave_approver);
+				} 
+			});
+		}
+	},
+	reporting_date:function(frm){
+		console.log(frm.doc.reporting_date);
+		var from_date = new Date(frm.doc.reporting_date);
+		var day = from_date.getDate();
+		var year = from_date.getFullYear();
+		var month = from_date.getMonth()+1;
+		cur_frm.fields_dict.reporting_date.datepicker.update({
+		 minDate: new Date(year, month - 1, day)
+		});
+	}
+
+});
+function joining_report_status_update(frm,action_type) {
+	frm.set_value("status",action_type);
+	frm.savesubmit();
+	// frm.reload_doc();
+	return action_type;
+}
+function get_leave_data(frm) {
+	let details = []
+	frappe.call({
+		"method": 'admin_iiti.admin_iiti.doctype.employee_joining_report.employee_joining_report.get_leave_data',
+		"args": {
+			"employee": frm.doc.employee,
+		},
+		"async": false,
+		callback: function (r) {
+			let  data = r.message;
+			if (r && r.message) {
+				details = data;
+			}
+		}
+		
 	});
-	return email;
+	return details;
 }

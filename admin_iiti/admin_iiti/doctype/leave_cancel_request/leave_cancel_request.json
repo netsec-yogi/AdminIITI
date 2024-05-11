@@ -8,6 +8,7 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "section_break_1",
   "employee",
   "employee_name",
   "column_break_3",
@@ -15,14 +16,16 @@
   "designation",
   "leave_details_section",
   "leave_application",
+  "leave_cancel_type",
   "from_date",
   "to_date",
-  "total_leave_days",
   "column_break_11",
   "leave_type",
   "approver",
+  "total_leave_days",
   "status",
   "follow_via_email",
+  "doc_approved_date",
   "amended_from"
  ],
  "fields": [
@@ -31,7 +34,8 @@
    "fieldtype": "Link",
    "in_standard_filter": 1,
    "label": "Employee",
-   "options": "Employee"
+   "options": "Employee",
+   "reqd": 1
   },
   {
    "fetch_from": "employee.employee_name",
@@ -49,13 +53,15 @@
    "fetch_from": "employee.department",
    "fieldname": "department",
    "fieldtype": "Data",
-   "label": "Department"
+   "label": "Department",
+   "read_only": 1
   },
   {
    "fetch_from": "employee.designation",
    "fieldname": "designation",
    "fieldtype": "Data",
-   "label": "Designation"
+   "label": "Designation",
+   "read_only": 1
   },
   {
    "fieldname": "leave_details_section",
@@ -69,21 +75,25 @@
    "in_standard_filter": 1,
    "label": "Leave Application",
    "options": "Leave Application",
+   "reqd": 1,
    "unique": 1
   },
   {
    "fieldname": "from_date",
    "fieldtype": "Date",
+   "hidden": 1,
    "label": "From Date"
   },
   {
    "fieldname": "to_date",
    "fieldtype": "Date",
+   "hidden": 1,
    "label": "To date"
   },
   {
    "fieldname": "total_leave_days",
    "fieldtype": "Data",
+   "hidden": 1,
    "label": "Total Leave Days",
    "read_only": 1
   },
@@ -109,7 +119,8 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "Open\nApproved\nNot Approved"
+   "options": "Open\nApproved\nRejected\nNot Approved",
+   "read_only": 1
   },
   {
    "default": "1",
@@ -135,12 +146,31 @@
    "options": "Leave cancel Request",
    "print_hide": 1,
    "read_only": 1
+  },
+  {
+   "fieldname": "leave_cancel_type",
+   "fieldtype": "Select",
+   "label": "Leave Cancel Type",
+   "options": "\nCancelled\nAmended",
+   "reqd": 1
+  },
+  {
+   "fieldname": "doc_approved_date",
+   "fieldtype": "Datetime",
+   "hidden": 1,
+   "label": "doc_approved_date",
+   "read_only": 1
+  },
+  {
+   "description": "<b><h5 style=\"color: red;\">Note: Message</h5></b>",
+   "fieldname": "section_break_1",
+   "fieldtype": "Section Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-04-18 12:54:34.636916",
+ "modified": "2024-05-04 15:32:12.664982",
  "modified_by": "Administrator",
  "module": "Admin IITI",
  "name": "Leave cancel Request",
