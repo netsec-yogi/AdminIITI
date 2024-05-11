@@ -1,5 +1,6 @@
 {
  "actions": [],
+ "allow_import": 1,
  "allow_rename": 1,
  "autoname": "field:leave_application",
  "creation": "2023-02-04 11:40:41.051513",
@@ -170,7 +171,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-05-04 15:32:12.664982",
+ "modified": "2024-05-11 14:41:51.870943",
  "modified_by": "Administrator",
  "module": "Admin IITI",
  "name": "Leave cancel Request",
