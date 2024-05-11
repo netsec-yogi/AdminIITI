@@ -35,8 +35,8 @@ class EmployeeJoiningReport(Document):
             frappe.throw(
                 _("Only Leave Joining report with status 'Approved' and 'Not approved' and Cancel can be submitted"))
 
-        if self.status == "Approved" or self.status == 'Not Approved':
-            self.notify_employee()
+        if self.status == "Approved" or self.status == 'Rejected':
+            self.employee_notify()
 
         self.reload()
 
@@ -50,7 +50,7 @@ class EmployeeJoiningReport(Document):
                 frappe.msgprint(_("Please set default template for Leave Approval Notification in HR Settings."))
                 return
             email_template = frappe.get_doc("Email Template", template)
-            message = frappe.render_template(email_template.response, args)
+            message = frappe.render_template(email_template.response_html, args)
             notify(self, {
                 # for post in messages
                 "message": message,
@@ -70,7 +70,7 @@ class EmployeeJoiningReport(Document):
                 frappe.msgprint(_("Please set default template for Leave Approval Notification in HR Settings."))
                 return
             email_template = frappe.get_doc("Email Template", template)
-            message = frappe.render_template(email_template.response, args)
+            message = frappe.render_template(email_template.response_html, args)
 
             notify(self, {
                 # for post in messages
@@ -79,8 +79,8 @@ class EmployeeJoiningReport(Document):
                 # for email
                 "subject": email_template.subject
             })
-
-    def notify_employee(self):
+            
+    def employee_notify(self):
         employee = frappe.get_doc("Employee", self.employee)
         if not employee.user_id:
             return
@@ -94,7 +94,7 @@ class EmployeeJoiningReport(Document):
             frappe.msgprint(_("Please set default template for Leave Status Notification in HR Settings."))
             return
         email_template = frappe.get_doc("Email Template", template)
-        message = frappe.render_template(email_template.response, args)
+        message = frappe.render_template(email_template.response_html, args)
 
         notify(self, {
             # for post in messages
@@ -169,5 +169,17 @@ def check_delegate(user):
 
 
 @frappe.whitelist()
-def get_approver_list(txt, searchfield, start, page_len, filters):
-    frappe.throw('sss')
+def get_leave_data(employee):
+    Joining_data = frappe.db.get_list('Employee Joining Report',filters={'employee': employee})
+    
+    joining_array = [
+			d.name for d in Joining_data
+		]
+    
+    leave_data = frappe.db.get_list('Leave Application',fields = ["name"],filters=[['name','not in',joining_array],['status','=',"Approved"],["employee","=",employee],['leave_type','not in',['Casual Leave']]])
+    
+    leave_array = [
+			l.name for l in leave_data
+		]
+    
+    return  leave_array

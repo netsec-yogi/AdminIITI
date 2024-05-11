@@ -5,7 +5,9 @@ frappe.listview_settings['Leave cancel Request'] = {
 			return [__("Approved"), "green", "status,=,Approved"];
 		} else if (doc.status === "Not Approved") {
 			return [__("Not Approved"), "red", "status,=,Not Approved"];
-		} else {
+		} else if (doc.status === "Rejected") {
+			return [__("Rejected"), "red", "status,=,Rejected"];
+		}else {
 			return [__("Open"), "red", "status,=,Open"];
 		}
 	},

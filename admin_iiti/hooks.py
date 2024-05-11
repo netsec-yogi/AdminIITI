@@ -122,17 +122,22 @@ override_doctype_class = {
 #	}
 # }
 
-doc_events ={
+# doc_events ={
 
-    "Leave Application":{
+#     "Leave Application":{
 
-        "after_insert":"admin_iiti.overrides.after_insert_recommeder"
-	}
-}
+#         "after_insert":"admin_iiti.overrides.after_insert_recommeder"
+# 	}
+# }
 
 # Scheduled Tasks
 # ---------------
 
+scheduler_events= {
+	"daily": [
+  		"admin_iiti.admin_schedular.birthday_reminder_non_teaching",
+	]
+}
 # scheduler_events = {
 #	"all": [
 #		"admin_iiti.tasks.all"
@@ -205,4 +210,4 @@ doc_events ={
 # auth_hooks = [
 #	"admin_iiti.auth.validate"
 # ]
-update_website_context = "admin_iiti.overrides.update_website_context"
+#update_website_context = "admin_iiti.overrides.update_website_context"
