@@ -34,6 +34,6 @@ def birthday_reminder_non_teaching():
                 emp_year = getdate(emp.date_of_birth).year
                 
                 if CurrentDay == emp_day and CurrentMonth == emp_month and emp_year < Currentyear :
-                    frappe.throw(_("Today is {0} Birthday {1}").format(emp.employee_name, emp.date_of_birth))
+                    frappe.throw(_("Today is the {0} Birthday {1}").format(emp.employee_name, emp.date_of_birth))
     
     
