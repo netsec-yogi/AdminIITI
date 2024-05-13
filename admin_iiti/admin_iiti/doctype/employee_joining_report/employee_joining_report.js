@@ -88,14 +88,16 @@ frappe.ui.form.on('Employee Joining Report', {
 				query: 'admin_iiti.overrides.get_approvers',
 			};
 		});
-		let data = get_leave_data(frm);
-        //filter for leave_application field only show approved applications
-		cur_frm.fields_dict.leave_application.get_query = function(doc) {
-			return {
-				filters: {
-					name : ['IN',data]
-				},
-				order_by: 'posting_date desc',
+		if(frm.doc.employee){
+			let data = get_leave_data(frm);
+			//filter for leave_application field only show approved applications
+			cur_frm.fields_dict.leave_application.get_query = function(doc) {
+				return {
+					filters: {
+						name : ['IN',data]
+					},
+					order_by: 'posting_date desc',
+				}
 			}
 		}
 		
