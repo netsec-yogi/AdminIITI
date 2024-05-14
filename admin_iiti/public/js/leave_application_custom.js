@@ -43,6 +43,7 @@ frappe.ui.form.on("Leave Application", {
 				() => cancel_leave_application(frm)).addClass("btn-danger")
 				.css({ 'color': '#ffffff', 'font-weight': 'bold', 'background-color': '#17a2b8' });
 			}
+			frm.trigger("default_discussion_button");
 			// if(frm.doc.leave_approver == logged_user && frm.doc.status == 'Approved'){
 			// 	frm.disable_form();
 			// 	frm.toggle_display('approved',false);
@@ -104,6 +105,7 @@ frappe.ui.form.on("Leave Application", {
 				() => cancel_leave_application(frm)).addClass("btn-danger")
 				.css({ 'color': '#ffffff', 'font-weight': 'bold', 'background-color': '#17a2b8' });
 			}
+			frm.trigger("default_discussion_button");
 		}else{
 			frm.toggle_display('submit_form',true);
 			document.querySelectorAll("[data-fieldname='submit_form']")[1].style.backgroundColor="#00b2ff";
@@ -361,7 +363,7 @@ frappe.ui.form.on("Leave Application", {
 			// this is used to html template code render for  leave application dashborad call 
 			$("div").remove(".form-dashboard-section.custom");
 			var data = leave_details
-			var template = '{% if not jQuery.isEmptyObject(data) %}<table class="table table-bordered small"><thead><tr><th style="width: 16%">{{ __("Leave Type") }}</th><th style="width: 16%" class="text-right">{{ __("Leave Balance") }}</th></tr></thead><tbody>{% for(const [key, value] of Object.entries(data)) { %}<tr><td> {%= key %} </td><td class="text-right"> {%= value["remaining_leaves"] %} </td></tr>{% } %}</tbody></table>{% else %}<p style="margin-top: 30px;"> No Leave has been allocated. </p>{% endif %}'
+			var template = '{% if not jQuery.isEmptyObject(data) %}<div class="row">{% for(const [key, value] of Object.entries(data)) { %}<div class="col-lg-3 col-sm-6" style="position: relative;max-width: 24%;background-color: #17a2b83d;background-clip: border-box;border: 2px solid rgb(35 40 47 / 13%);border-radius: 0.75rem;"><div class="circle-tile "><div class="circle-tile-content blue"><div class="circle-tile-description text-faded" style="font-weight: 700;">{%= key %}</div><a class="circle-tile-footer" href="">{%= value["remaining_leaves"] %}<iclass="fa fa-chevron-circle-right"></i></a></div></div></div>&nbsp;{% } %}</div></div>{% else %}<p style="margin-top: 30px;"> No Leave has been allocated. </p>{% endif %}'
 			frm.dashboard.add_section(
 				frappe.render_template(template, {
 					data: leave_details
@@ -399,7 +401,57 @@ frappe.ui.form.on("Leave Application", {
 				}
 			}
 		});
-	}
+	},
+	default_discussion_button:function(frm){
+		frm.add_custom_button(__("Discussion"), function () {
+			frm.trigger("discussion_remark");
+		}).addClass("btn-info").css({ 'color': '#ffffff', 'font-weight': 'bold', 'background-color': '#333c44' });
+	},
+	discussion_remark:function(frm){
+		var d = new frappe.ui.Dialog({
+			title: __('Discussion'),
+			fields: [
+				{
+					"fieldname": "employee",
+					"fieldtype": "Link",
+					"default":frm.doc.owner,
+					"reqd": 1,
+					"label": "Employee",
+					"options": "User",
+					//"read_only": 1
+				},
+				{
+					"fieldname": "remark",
+					"fieldtype": "Text",
+					"reqd": 1,
+				}
+			],
+			primary_action: function() {
+				var data = d.get_values();
+				let remark = 'Discussion: ' + data.remark;
+				let user_id = data.employee;
+	
+				frappe.call({
+					method: "frappe.desk.form.utils.add_comment",
+					args: {
+						reference_doctype: frm.doc.doctype,
+						reference_name: frm.doc.name,
+						content: __(remark),
+						comment_email: frappe.session.user,
+						comment_by: frappe.session.user_fullname
+					},
+					callback: function(r) {
+						if(!r.exc) {
+							send_email_for_discussion(frm,remark,user_id);
+							d.hide();
+							cur_frm.reload_doc();
+						}
+					}
+				});
+			}
+		});
+		d.show();
+	},
 });
 function change_leave_status(frm,action_type) {
 	frappe.call({
@@ -667,6 +719,26 @@ function update_leave_doc(frm,reason_for_cancel){
 					frm.set_value('status','Cancelled');
 					//frm.save();
 					frappe.msgprint("Your Leave application cancelled sucessfully");
+				}
+			}
+		});
+	}
+}
+function send_email_for_discussion(frm,remark,user_id){
+	if(remark){
+		frappe.call({
+			"method": 'admin_iiti.overrides.leave_discussion_email_send',
+			"args": {
+				"contant": remark,
+				"email_id":user_id,
+				"doctype":frm.doc.doctype,
+				"docname":frm.doc.name,
+			},
+			"async": false,
+			callback: function (r) {
+				let data = r.message;
+				if (r && r.message) {
+					doc.reload_doc();
 				}
 			}
 		});

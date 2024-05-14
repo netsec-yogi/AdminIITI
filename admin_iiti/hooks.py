@@ -136,6 +136,7 @@ override_doctype_class = {
 scheduler_events= {
 	"daily": [
   		"admin_iiti.admin_schedular.birthday_reminder_non_teaching",
+        "admin_iiti.admin_schedular.pending_leave_reminder",
 	]
 }
 # scheduler_events = {
