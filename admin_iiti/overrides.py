@@ -545,4 +545,23 @@ def cancel_leave_email(docname,User,reason):
                 "message_to":User,
                 "subject":email_template.subject,
             })
-    
+@frappe.whitelist()
+def leave_discussion_email_send(contant,email_id,doctype,docname):
+    if email_id:
+        parent_doc = frappe.get_doc(doctype,docname)
+        args = parent_doc.as_dict()
+        args.update({'resone':contant})
+        
+        template = 'Global Discussion For Document'
+        
+        if not template:
+            frappe.msgprint(frappe._("Please set default template for Discussion."))
+            return
+        
+        email_template = frappe.get_doc("Email Template",template)
+        message = frappe.render_template(email_template.response_html,args)
+        notify(args,{
+            "message":message,
+            "message_to":email_id,
+            "subject":email_template.subject + " " + docname,
+        })
