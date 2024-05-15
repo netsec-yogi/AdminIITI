@@ -16,6 +16,7 @@ from frappe.utils import (
     nowdate,
     now_datetime
 )
+from datetime import date, timedelta
 
 def birthday_reminder_non_teaching():
     data = frappe.get_all('Employee',fields=["*"], filters=[["status", "=","Active"],["employee_category", "=","Non-Teaching"]])
@@ -40,24 +41,27 @@ def pending_leave_reminder():
     data = frappe.get_all('Leave Application',fields=["*"],filters=[['status','not in',['Amended','Rejected','Cancelled','Approved']],['docstatus','!=','2']])
 
     value = frappe.db.count('Leave Application',filters=[['status','not in',['Amended','Rejected','Cancelled','Approved']],['docstatus','!=','2']])
-
+    
+    current_date = datetime.date.today()
     for leave in data:
+        # Calculate the date 5 days before today's date
+        fivedatebefore = leave.from_date - timedelta(5)
         if leave.status == 'Open':
-            if leave.leave_recommenders:
-                recommender_data = frappe.db.get_list('Indent Recommended',fields=["*"],filters=[
-                    ["parent", "=", leave.name]
-                    ])
-                if recommender_data:
-                    for recomm_list in recommender_data:
-                        if recomm_list.status == 'Open':
+            recommender_data = frappe.db.get_list('Leave Recommender',fields=["*"],filters=[["parent", "=", leave.name]])
+            if recommender_data:
+                for recomm_list in recommender_data:
+                    if recomm_list.status == 'Open':
+                        # if current_date >= fivedatebefore and leave.from_date >= current_date:
+                        if current_date >= fivedatebefore:
                             send_leave_reminder(leave.name,recomm_list.recommender,1)
-
             else:
                 if leave.leave_approver:
-                    send_leave_reminder(leave.name,leave.leave_approver,2)
+                    if current_date >= fivedatebefore:
+                        send_leave_reminder(leave.name,leave.leave_approver,2)
         
         elif leave.status == 'Recommended':
-            send_leave_reminder(leave.name,leave.leave_approver,2)
+            if current_date >= fivedatebefore:
+                send_leave_reminder(leave.name,leave.leave_approver,2)
 
 
 def send_leave_reminder(docname,email_id,flag):
