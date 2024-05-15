@@ -162,7 +162,7 @@
    "read_only": 1
   },
   {
-   "description": "<b><h5 style=\"color: red;\">Note: Message</h5></b>",
+   "description": "<b><h5 style=\"color: red;\">Note:</h5><h5> If you want to cancel the full applied leave then select the Leave cancel type is cancelled. While partial cancellation of leave you may select Amended and select the duration of cancellation of the leave.</h5></b>",
    "fieldname": "section_break_1",
    "fieldtype": "Section Break"
   }
@@ -170,7 +170,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-05-04 15:32:12.664982",
+ "modified": "2024-05-15 15:03:33.820504",
  "modified_by": "Administrator",
  "module": "Admin IITI",
  "name": "Leave cancel Request",

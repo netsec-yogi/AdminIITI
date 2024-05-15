@@ -31,6 +31,7 @@ frappe.ui.form.on("Leave Application", {
 			frm.disable_save();
 		}else{
 			frm.toggle_display('status',true);
+			frm.toggle_display('follow_via_email',true);
 			frm.set_df_property("status", "read_only", 0);
 		}
 		if (!frm.is_new()) {
@@ -60,6 +61,8 @@ frappe.ui.form.on("Leave Application", {
 			frm.disable_save();
 		}else{
 			frm.toggle_display('status',true);
+			frm.toggle_display('follow_via_email',true);
+			frm.set_df_property("status", "read_only", 0);
 		}
 		if (!frm.is_new()) {
 			frm.toggle_display('submit_form',false);

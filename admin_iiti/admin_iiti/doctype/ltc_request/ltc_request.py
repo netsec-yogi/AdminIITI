@@ -523,3 +523,16 @@ def update_LTC_status(doctype, document_name, status, user):
     # frappe.throw(frappe.as_json(doc))
 
     return status
+
+@frappe.whitelist()
+def cancel_doc(contant,email_id,doctype,docname,action):
+    if action == 'Cancelled':
+        doc = frappe.get_doc(doctype,docname)
+        data = frappe.db.set_value(doctype,{'name':docname},{'docstatus':1},update_modified = False)
+        data = frappe.db.set_value(doctype,{'name':docname},{'docstatus':2,'status':action},update_modified = False)
+        frappe.db.commit()
+        message = 'update'
+    else:
+        message = 'error'
+        
+    return message
