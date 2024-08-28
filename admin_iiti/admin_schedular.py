@@ -52,16 +52,13 @@ def pending_leave_reminder():
                 for recomm_list in recommender_data:
                     if recomm_list.status == 'Open':
                         # if current_date >= fivedatebefore and leave.from_date >= current_date:
-                        if current_date >= fivedatebefore:
-                            send_leave_reminder(leave.name,recomm_list.recommender,1)
+                        send_leave_reminder(leave.name,recomm_list.recommender,1)
             else:
                 if leave.leave_approver:
-                    if current_date >= fivedatebefore:
-                        send_leave_reminder(leave.name,leave.leave_approver,2)
+                    send_leave_reminder(leave.name,leave.leave_approver,2)
         
         elif leave.status == 'Recommended':
-            if current_date >= fivedatebefore:
-                send_leave_reminder(leave.name,leave.leave_approver,2)
+            send_leave_reminder(leave.name,leave.leave_approver,2)
 
 
 def send_leave_reminder(docname,email_id,flag):

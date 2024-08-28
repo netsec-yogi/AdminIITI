@@ -26,6 +26,7 @@
   "status",
   "follow_via_email",
   "doc_approved_date",
+  "year",
   "amended_from"
  ],
  "fields": [
@@ -119,8 +120,7 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "Open\nApproved\nRejected\nNot Approved",
-   "read_only": 1
+   "options": "Open\nApproved\nRejected\nNot Approved"
   },
   {
    "default": "1",
@@ -165,12 +165,19 @@
    "description": "<b><h5 style=\"color: red;\">Note:</h5><h5> If you want to cancel the full applied leave then select the Leave cancel type is cancelled. While partial cancellation of leave you may select Amended and select the duration of cancellation of the leave.</h5></b>",
    "fieldname": "section_break_1",
    "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "year",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Year",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-05-20 17:16:35.801565",
+ "modified": "2024-08-23 13:00:29.818697",
  "modified_by": "Administrator",
  "module": "Admin IITI",
  "name": "Leave cancel Request",

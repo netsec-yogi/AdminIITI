@@ -7,6 +7,7 @@ frappe.ui.form.on('LTC Request', {
 		let logged_user = frappe.session.user;
 		if (frm.is_new()) {
 			frm.trigger("calculate_total_days");
+			frm.set_value('status','Open');
 		}else{
 			if(frappe.user.has_role('HR Dealing Assistant') && frm.doc.status == 'Open' || !frm.doc.owner == frappe.session.user ){
 				frm.add_custom_button(__('Proceed'), function () {
@@ -179,12 +180,12 @@ frappe.ui.form.on('LTC Request', {
 				filters: [
 					["leave_application", "=", frm.doc.leave_application]
 				],
-				fieldname: "name"
+				fieldname: ["name","docstatus"]
 			},
 			"callback": function (response) {
 				var data = response.message;
 
-				if (data.name) {
+				if (data.name && data.docstatus != 2) {
 
 					frappe.msgprint(__("You already Applied LTC Request for this Leave Application"));
 					frm.set_value("leave_application", "")
