@@ -2,6 +2,13 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on('Leave cancel Request', {
+	setup:function(frm){
+		if(frm.is_new()){
+			var today = new Date();
+			var yyyy = today.getFullYear();
+			cur_frm.set_value("year",yyyy);
+		}
+	},
 	refresh: function(frm) {
 		let logged_user = frappe.session.user;
 		if (!frm.doc.employee && frappe.defaults.get_user_permissions()) {
@@ -66,7 +73,7 @@ frappe.ui.form.on('Leave cancel Request', {
 			return {
 				filters: {
 					status: 'Approved',
-					leave_type: ['not in', 'Other Leave']
+					//leave_type: ['not in', 'Other Leave']
 				},
 			}
 		}

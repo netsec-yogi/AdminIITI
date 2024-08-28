@@ -1,5 +1,16 @@
 frappe.listview_settings['Leave cancel Request'] = {
 	has_indicator_for_draft: 1,
+	onload: function(listview) {
+
+        if(frappe.session.user != 'Administrator'){
+            frappe.set_route('List', 'Leave cancel Request','List');
+			var today = new Date();
+			var yyyy = today.getFullYear();
+            frappe.route_options = {
+                year: yyyy
+            }
+        }
+	},
 	get_indicator: function (doc) {
 		if (doc.status === "Approved") {
 			return [__("Approved"), "green", "status,=,Approved"];

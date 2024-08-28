@@ -179,12 +179,12 @@ frappe.ui.form.on('LTC Request', {
 				filters: [
 					["leave_application", "=", frm.doc.leave_application]
 				],
-				fieldname: "name"
+				fieldname: ["name","docstatus"]
 			},
 			"callback": function (response) {
 				var data = response.message;
-
-				if (data.name) {
+				console.log('data',data);
+				if (data.name && data.docstatus != 2) {
 
 					frappe.msgprint(__("You already Applied LTC Request for this Leave Application"));
 					frm.set_value("leave_application", "")
@@ -212,7 +212,7 @@ frappe.ui.form.on('LTC Request', {
 
 				if (one_year_date > current_date) {
 
-					frappe.msgprint(__("After One Year Services Than you Can Applied LTC."));
+					frappe.msgprint(__("After One Year Services than you can applied LTC."));
 					frm.set_value("employee", "")
 
 				}

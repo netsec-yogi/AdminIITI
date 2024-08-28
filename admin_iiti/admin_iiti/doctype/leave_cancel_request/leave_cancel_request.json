@@ -21,11 +21,13 @@
   "to_date",
   "column_break_11",
   "leave_type",
+  "leave_type_name",
   "approver",
   "total_leave_days",
   "status",
   "follow_via_email",
   "doc_approved_date",
+  "year",
   "amended_from"
  ],
  "fields": [
@@ -139,15 +141,6 @@
    "read_only": 1
   },
   {
-   "fieldname": "amended_from",
-   "fieldtype": "Link",
-   "label": "Amended From",
-   "no_copy": 1,
-   "options": "Leave cancel Request",
-   "print_hide": 1,
-   "read_only": 1
-  },
-  {
    "fieldname": "leave_cancel_type",
    "fieldtype": "Select",
    "label": "Leave Cancel Type",
@@ -165,12 +158,27 @@
    "description": "<b><h5 style=\"color: red;\">Note:</h5><h5> If you want to cancel the full applied leave then select the Leave cancel type is cancelled. While partial cancellation of leave you may select Amended and select the duration of cancellation of the leave.</h5></b>",
    "fieldname": "section_break_1",
    "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "year",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "in_standard_filter": 1,
+   "label": "Year",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "leave_application.other_leave_type",
+   "fieldname": "leave_type_name",
+   "fieldtype": "Data",
+   "label": "Other Leave Name",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-05-15 15:03:33.820504",
+ "modified": "2024-07-31 11:43:48.080772",
  "modified_by": "Administrator",
  "module": "Admin IITI",
  "name": "Leave cancel Request",

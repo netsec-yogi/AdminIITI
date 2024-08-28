@@ -43,6 +43,7 @@
   "ltc_details_section",
   "ltc_claimed",
   "i_undertake_section",
+  "section_break_36",
   "a",
   "b",
   "admin_section_tab",
@@ -155,13 +156,13 @@
   {
    "fieldname": "departure_date",
    "fieldtype": "Date",
-   "label": "Departure Date",
+   "label": "Date Of Onward Journey",
    "reqd": 1
   },
   {
    "fieldname": "arrival_date",
    "fieldtype": "Date",
-   "label": "Arrival Date",
+   "label": "Date Of Return Journey",
    "reqd": 1
   },
   {
@@ -219,7 +220,7 @@
   },
   {
    "default": "0",
-   "description": "To furnish the adjustment bill within one month from the date of completion of return journey when advance is drown or within three months when advance is not drown.",
+   "description": "<h5>To furnish the adjustment bill within one month from the date of completion of return journey when advance is drown or within three months when advance is not drown.</h5>",
    "fieldname": "a",
    "fieldtype": "Check",
    "label": "A",
@@ -227,7 +228,7 @@
   },
   {
    "default": "0",
-   "description": "To Produce air tickets with stamped boarding pass/railway tickets/bus cash receipts (public transport only ) for both the onward as well as return journeys.",
+   "description": "<h5>To Produce air tickets with stamped boarding pass/railway tickets/bus cash receipts (public transport only ) for both the onward as well as return journeys.</h5>",
    "fieldname": "b",
    "fieldtype": "Check",
    "label": "B",
@@ -317,6 +318,7 @@
    "label": "Admin Section"
   },
   {
+   "default": "0",
    "fieldname": "amount_advance",
    "fieldtype": "Float",
    "hidden": 1,
@@ -324,6 +326,7 @@
    "mandatory_depends_on": "eval:doc.status == 'Processed'"
   },
   {
+   "default": "0",
    "fieldname": "calculation_basic_pay",
    "fieldtype": "Data",
    "hidden": 1,
@@ -331,6 +334,7 @@
    "mandatory_depends_on": "eval:doc.status == 'Processed'"
   },
   {
+   "default": "0",
    "fieldname": "calculation_of_encashment_of_el",
    "fieldtype": "Data",
    "hidden": 1,
@@ -422,6 +426,12 @@
    "fieldname": "document_update__date_time_details_section",
    "fieldtype": "Section Break",
    "label": "Document Update  Date time Details"
+  },
+  {
+   "description": "<h5 style=\"color: red;\"><b>Note :- All the Staff members are required to notify of any change(s) to their LTC travel plans, including the onward journey date, return journey date, destination, or any other modifications, at least one week before the journey begins. The requests for changes made after the commencement of the journey will not be entertained.</b></h5>",
+   "fieldname": "section_break_36",
+   "fieldtype": "Section Break",
+   "label": "I undertake"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -432,7 +442,7 @@
    "link_fieldname": "ltc_reference_number"
   }
  ],
- "modified": "2024-05-21 13:13:18.542752",
+ "modified": "2024-07-25 17:43:19.204785",
  "modified_by": "Administrator",
  "module": "Admin IITI",
  "name": "LTC Request",
