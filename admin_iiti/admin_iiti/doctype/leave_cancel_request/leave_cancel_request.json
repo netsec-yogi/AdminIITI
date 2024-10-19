@@ -21,9 +21,11 @@
   "to_date",
   "column_break_11",
   "leave_type",
+  "leave_type_name",
   "approver",
   "total_leave_days",
   "status",
+  "reason",
   "follow_via_email",
   "doc_approved_date",
   "year",
@@ -139,15 +141,6 @@
    "read_only": 1
   },
   {
-   "fieldname": "amended_from",
-   "fieldtype": "Link",
-   "label": "Amended From",
-   "no_copy": 1,
-   "options": "Leave cancel Request",
-   "print_hide": 1,
-   "read_only": 1
-  },
-  {
    "fieldname": "leave_cancel_type",
    "fieldtype": "Select",
    "label": "Leave Cancel Type",
@@ -170,14 +163,27 @@
    "fieldname": "year",
    "fieldtype": "Data",
    "hidden": 1,
+   "in_standard_filter": 1,
    "label": "Year",
    "read_only": 1
+  },
+  {
+   "fetch_from": "leave_application.other_leave_type",
+   "fieldname": "leave_type_name",
+   "fieldtype": "Data",
+   "label": "Other Leave Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "reason",
+   "fieldtype": "Small Text",
+   "label": "Reason For Cancellation"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-08-23 13:00:29.818697",
+ "modified": "2024-10-16 10:19:05.649432",
  "modified_by": "Administrator",
  "module": "Admin IITI",
  "name": "Leave cancel Request",

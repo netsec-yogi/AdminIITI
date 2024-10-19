@@ -293,14 +293,12 @@
    "read_only": 1
   },
   {
-   "fetch_from": "leave_application.from_date",
    "fieldname": "leave_from_date",
    "fieldtype": "Data",
    "hidden": 1,
    "label": "Leave From Date"
   },
   {
-   "fetch_from": "leave_application.to_date",
    "fieldname": "leave_to_date",
    "fieldtype": "Data",
    "hidden": 1,
@@ -442,7 +440,7 @@
    "link_fieldname": "ltc_reference_number"
   }
  ],
- "modified": "2024-07-25 17:42:54.072564",
+ "modified": "2024-09-02 12:07:34.983049",
  "modified_by": "Administrator",
  "module": "Admin IITI",
  "name": "LTC Request",

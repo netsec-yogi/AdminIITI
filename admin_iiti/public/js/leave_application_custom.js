@@ -35,6 +35,12 @@ frappe.ui.form.on("Leave Application", {
 			frm.set_df_property("status", "read_only", 0);
 		}
 		if (!frm.is_new()) {
+			if(frm.doc.status == 'Rejected'){
+				frm.toggle_display('recommended',false);
+				frm.toggle_display('approved',false);
+				frm.toggle_display('not_recommended',false);
+				frm.toggle_display('not_approved',false);
+			}
 			frm.toggle_display('submit_form',false);
 			if(frm.doc.leave_balance == 0){
 				frm.toggle_display("leave_balance",false);
@@ -344,6 +350,14 @@ frappe.ui.form.on("Leave Application", {
 			}
 		}
 	},
+	not_approved: function(frm) {
+		var action_type = 'Rejected';
+		change_leave_status(frm,action_type);
+	},
+	not_recommended: function(frm) {
+		var action_type = 'Rejected';
+		change_leave_status(frm,action_type);
+	},
 	make_dashboard: function(frm) {
 		var leave_details;
 		let lwps;
@@ -468,20 +482,28 @@ function change_leave_status(frm,action_type) {
 		},
 		callback: function (r) {
 			var status = r.message;
-			var child_doc_status = 'Recommended';
 			console.log("status",status);
 			if(status == 'Open'){
+				var child_doc_status = 'Recommended';
 				frm.set_value('status',status);
 				update_child_data(frm, child_doc_status);
 				cur_frm.reload_doc();
-			}else{
+				frappe.msgprint("Thank you for recommended the leave application. ");
+			}else if(status == 'Recommended'){
+				var child_doc_status = 'Recommended';
 				frm.set_value('status',status);
 				update_child_data(frm, child_doc_status);
 				cur_frm.save();
-				//cur_frm.reload_doc();
-
+				frappe.msgprint("Thank you for recommended the leave application. ");
+			}else{
+				var child_doc_status = 'Rejected';
+				frm.set_value('status',status);
+				update_child_data(frm, child_doc_status);
+				cur_frm.save();
+				cur_frm.reload_doc();
+				frappe.msgprint("Leave application has been rejected. ")
 			}
-			frappe.msgprint("Thank you for recommended the leave application. ")
+			
 		
 		}
 	});

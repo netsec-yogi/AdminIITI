@@ -356,7 +356,7 @@ def set_leave_status(leave_application_name,doctype, user,action_type, leave_typ
                 status = 'Recommended'
                 return status
 
-    elif status == 'Rejected':
+    elif action_type == 'Rejected':
         frappe.db.set_value("Leave Recommender",{'parent': leave_application_name,'recommender':user,'parenttype':doctype},{'status': 'Rejected','docstatus':1,'recommend_date_time':current_date_time},update_modified=False)
         
         frappe.db.set_value("Leave Application",{'name': leave_application_name},{'status': 'Rejected','docstatus':1,'doc_approved_date':current_date_time},update_modified=False)
