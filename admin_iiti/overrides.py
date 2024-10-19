@@ -288,7 +288,8 @@ class CustomLeaveApplication(Document):
             self.half_day_date = None
     
     def validate_leave_balance(self):
-        if int(self.leave_balance) <= 0 and self.leave_type_name != 'Other Leave':
+        #int(self.leave_balance)
+        if self.leave_balance <= 0 and self.leave_type_name != 'Other Leave':
             msg = _("Warning: Insufficient leave balance for Leave Type {0} in this allocation.").format(
 					frappe.bold(self.leave_type)
 				)
