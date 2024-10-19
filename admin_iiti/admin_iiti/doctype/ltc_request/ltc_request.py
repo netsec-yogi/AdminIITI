@@ -5,6 +5,7 @@
 from datetime import datetime
 import json
 from re import template
+from datetime import timedelta
 from hrms.hr.doctype.leave_application.leave_application import LeaveApplication
 import frappe
 from frappe.model.document import Document
@@ -221,6 +222,19 @@ def El_update(self):
     # El_balance = frappe.db.get_value("Leave Allocation",{"employee":self.employee,"leave_type_name": 'Earned Leave'},"total_leaves_allocated",as_dict=1)
 
     #:p EL Leave application Create
+    
+    
+    departure_date = self.departure_date
+    
+    # Convert the string date to a date object
+    departure_date_obj = getdate(departure_date)
+
+    # Add 10 days to the departure_date
+    new_departure_date = departure_date_obj + timedelta(days=9)
+
+    # If you want the result as a string again (in 'YYYY-MM-DD' format)
+    new_arrival_date_str = formatdate(new_departure_date, "yyyy-mm-dd")
+    
 
     El = frappe.new_doc("Leave Application")
     El.employee = self.employee
@@ -229,7 +243,7 @@ def El_update(self):
     El.department = self.department
     El.leave_balance = El_balance
     El.from_date = self.departure_date
-    El.to_date = self.arrival_date
+    El.to_date = new_arrival_date_str
     El.total_leave_days = self.encashment_days
     El.status = 'Approved'
     El.leave_approver = frappe.session.user
@@ -252,15 +266,14 @@ def El_update(self):
         doc.leave_type = 'Earned Leave'
         doc.transaction_type = 'Leave Application'
         doc.transaction_name = El_application.name
-        doc.leaves = new_El_balance * -1
+        doc.leaves = int(new_El_balance) * -1
         doc.company = 'IITI'
         doc.from_date = self.departure_date
-        doc.to_date = self.arrival_date
+        doc.to_date = new_arrival_date_str
         doc.holiday_list = get_holiday_list_for_employee(self.employee, raise_exception=True) or ''
         doc.flags.ignore_validate = True
         doc.flags.ignore_permissions = 1
         doc.docstatus = 1
-        ##frappe.throw(frappe.as_json(doc))
         doc.db_insert()
 
 
