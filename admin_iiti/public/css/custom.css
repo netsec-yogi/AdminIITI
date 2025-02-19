@@ -1,0 +1,83 @@
+/* Improve overall input styling */
+.frappe-control .form-control {
+    border: 1.5px solid #ced4da; /* Subtle grey border */
+    border-radius: 6px; /* Soft rounded corners */
+    padding: 5px 14px;
+    font-size: 14px;
+    font-weight: 500;
+    background-color: #fff; /* Clean white background */
+    transition: all 0.3s ease-in-out;
+    box-shadow: none;
+}
+
+/* Add smooth hover effect */
+.frappe-control .form-control:hover {
+    border-color: #80bdff;
+}
+
+/* Add professional focus effect */
+.frappe-control .form-control:focus {
+    border-color: #007bff; /* Highlight blue */
+    box-shadow: 0px 0px 6px rgba(0, 123, 255, 0.3);
+    background-color: #f8f9fa; /* Light grey to indicate focus */
+    outline: none;
+}
+
+/* Improve placeholder styling */
+.frappe-control .form-control::placeholder {
+    color: #6c757d;
+    font-style: normal;
+    font-size: 13px;
+}
+
+/* Make disabled inputs look clean */
+.frappe-control .form-control:disabled {
+    background-color: #e9ecef;
+    border-color: #d6d8db;
+    cursor: not-allowed;
+}
+
+/* Style all form-group elements for spacing */
+.frappe-control {
+    margin-bottom: 16px;
+}
+
+/* Label styling for better clarity */
+.frappe-control label {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+div.form-section-description {
+    background-color: #D9E6F2 !important;  /* Light blue background */
+    color: #2490EF !important;             /* Blue text */
+    padding: 12px 16px !important;
+    text-align: center !important;
+    border-radius: 20px !important;        /* Rounded corners */
+    font-weight: bold !important;
+    text-transform: uppercase !important;
+    border-left: 2px solid #2490EF; 
+    border-right: 2px solid #2490EF; 
+    font-size: 15px !important;
+    margin-top: 20px !important;
+    margin-bottom: 20px !important;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1) !important; /* Soft shadow */
+}
+
+/* Ensure responsive styles apply */
+@media (max-width: 768px) {
+    div.form-section-description {
+        font-size: 14px !important;
+        padding: 10px 12px !important;
+    }
+}
+
+/* If padding inside form fields is needed */
+
+
+/* Ensure fields have proper spacing */
+.form-page {
+  
+    padding: 20px 15px;
+}

@@ -1,0 +1,215 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2025-02-18 15:13:03.603843",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "personal_information_section",
+  "naming_series",
+  "employee",
+  "employee_name",
+  "column_break_5",
+  "designation",
+  "department",
+  "date_of_joining",
+  "user_id",
+  "column_break_8",
+  "position_applying_for",
+  "location_of_the_position",
+  "column_break_12",
+  "reason_for_applying",
+  "application_submission_date",
+  "required_supporting_documents_section",
+  "application_form",
+  "column_break_17",
+  "office_memorandum",
+  "amended_from",
+  "section_break_20",
+  "outside_position_previous_applications",
+  "reporting_officer_information_section",
+  "reporting_officer_name",
+  "reporting_officer_designation",
+  "column_break_25",
+  "reporting_officer_department",
+  "reporting_officer_contact"
+ ],
+ "fields": [
+  {
+   "description": "\n        Personal Information\n",
+   "fieldname": "personal_information_section",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Naming Series",
+   "options": "IIT-Admin-OPR-.YYYY.-"
+  },
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "Employee",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "employee_name",
+   "fieldtype": "Data",
+   "label": "Employee Name"
+  },
+  {
+   "fieldname": "designation",
+   "fieldtype": "Link",
+   "label": "Designation",
+   "options": "Designation"
+  },
+  {
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "label": "Department",
+   "options": "Department"
+  },
+  {
+   "fieldname": "date_of_joining",
+   "fieldtype": "Data",
+   "label": "Date of Joining"
+  },
+  {
+   "fieldname": "position_applying_for",
+   "fieldtype": "Data",
+   "label": "Position Applying For"
+  },
+  {
+   "fieldname": "location_of_the_position",
+   "fieldtype": "Data",
+   "label": "Location of the Position"
+  },
+  {
+   "fieldname": "reason_for_applying",
+   "fieldtype": "Data",
+   "label": "Reason for Applying"
+  },
+  {
+   "fieldname": "application_submission_date",
+   "fieldtype": "Data",
+   "label": "Application Submission Date"
+  },
+  {
+   "description": "\n    Required Supporting Documents\n<span class=\"h6 text-danger\">(Please upload the necessary documents for your request)</span>\n\n",
+   "fieldname": "required_supporting_documents_section",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "application_form",
+   "fieldtype": "Attach",
+   "label": "Application Form <b><small style=\"color: red;\">(as per IIT Indore guidelines)</small></b>"
+  },
+  {
+   "fieldname": "office_memorandum",
+   "fieldtype": "Attach",
+   "label": "Office Memorandum for Joining Service at IIT Indore <b><small style=\"color: red; white-space: nowrap;\">(if applicable)</small></b>"
+  },
+  {
+   "description": "\n    Position Details\n",
+   "fieldname": "column_break_8",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_12",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_17",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Outside Position",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "outside_position_previous_applications",
+   "fieldtype": "Table",
+   "options": "Outside Position Previous Applications"
+  },
+  {
+   "description": "\nDetails of Previous Applications for Outside Positions\n\n",
+   "fieldname": "section_break_20",
+   "fieldtype": "Section Break"
+  },
+  {
+   "description": "Reporting Officer Information",
+   "fieldname": "reporting_officer_information_section",
+   "fieldtype": "Section Break",
+   "label": "Reporting Officer Information"
+  },
+  {
+   "fieldname": "reporting_officer_name",
+   "fieldtype": "Link",
+   "label": "Reporting Officer Name",
+   "options": "User"
+  },
+  {
+   "fieldname": "reporting_officer_designation",
+   "fieldtype": "Data",
+   "label": "Designation"
+  },
+  {
+   "fieldname": "reporting_officer_department",
+   "fieldtype": "Data",
+   "label": "Department/Office/Section"
+  },
+  {
+   "fieldname": "reporting_officer_contact",
+   "fieldtype": "Data",
+   "label": "Contact Details of Reporting Officer"
+  },
+  {
+   "fieldname": "column_break_25",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "user_id",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Employe Email"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2025-02-19 16:26:15.656060",
+ "modified_by": "Administrator",
+ "module": "Admin IITI",
+ "name": "Outside Position",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
