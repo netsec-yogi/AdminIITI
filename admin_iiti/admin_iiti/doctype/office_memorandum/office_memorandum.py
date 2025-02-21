@@ -1,8 +1,5 @@
-# Copyright (c) 2023, CITC IIT Indore and contributors
+# Copyright (c) 2025, CITC IIT Indore and contributors
 # For license information, please see license.txt
-
-import frappe
-from frappe.model.document import Document
 from frappe.utils import (
     add_days,
     cint,
@@ -15,48 +12,48 @@ from frappe.utils import (
     getdate,
     nowdate,
 )
-import json
-from frappe import _
+import frappe
+from frappe.model.document import Document
 
-class LTCOfficeMemorandum(Document):
+class OfficeMemorandum(Document):
     def on_update(self):
-        mail_user = frappe.db.get_list("Note Sheets Email", filters={'status':'Active','document_name':self.doctype},fields='*',ignore_permissions=True)
-        #frappe.throw(frappe.as_json(mail_user))
+        mail_user = frappe.db.get_list("Note Sheets Email", filters={'status':'Active','document_name':self.notesheet_name},fields='*',ignore_permissions=True)
         if mail_user:
             for i in mail_user:
                 self.notify_email_all_users(i.user_email)
                 
-        ltc_data = frappe.get_doc("LTC Request",self.name,as_dict= True)
-        if ltc_data:
-            self.notify_email_all_users(ltc_data.owner)
-
+        data = frappe.get_doc(self.notesheet_name,self.document_name,as_dict= True)
+        if data:
+            user_email = frappe.get_doc("Employee", data.employee).user_id
+            if user_email:
+                self.notify_email_all_users(user_email)
+            
     def notify_email_all_users(self,email_id):
         if email_id:
-            parent_doc = frappe.get_doc(self.doctype,self.name)
+            parent_doc = frappe.get_doc(self.notesheet_name,self.document_name)
             args = parent_doc.as_dict()
-            template = 'LTC Office Memorandum'
+            template = 'Office Memorandum'
             
             if not template:
-                frappe.msgprint(frappe._("Please set default template for LTC Office Memorandum ."))
+                frappe.msgprint(frappe._("Please set default template for Office Memorandum."))
                 return
             
             email_template = frappe.get_doc("Email Template",template)
             message = frappe.render_template(email_template.response_html,args)
             attachments = []
             # List of document types and names you want to attach
-            documents_to_attach = [
-                {"doctype": self.doctype, "name": self.name},
-                {"doctype": "LTC Request", "name": self.ltc_reference_number}
-            ]
-            # Generate attachments for each document
-            for doc in documents_to_attach:
-                attachment = frappe.attach_print(doc['doctype'], doc['name'], file_name=doc['name'])
-                attachments.append(attachment)
+            #attachment = frappe.attach_print(self.notesheet_name, self.document_name, file_name=self.document_name)
+            #attachments.append(attachment)
+            
+            if self.notesheet_name == 'Transport Allowance':
+                pass
+                #attachment = frappe.attach_print(self.notesheet_name, self.document_name, file_name=self.document_name,print_format='Transport Allowance OM')
+                #attachments.append(attachment)
+                
             notify(self,{
 				"message":message,
 				"message_to":email_id,
 				"subject":email_template.subject +" "+ self.name,
-				"attachments": attachments
 				})
             
 @frappe.whitelist()
@@ -79,8 +76,10 @@ def notify(self, args):
                 sender=sender["email"],
                 subject=args.subject,
                 message=args.message,
-                attachments=args.attachments,
+                # attachments=args.attachments,
             )
             frappe.msgprint(frappe._("Email sent to {0}").format(contact))
         except frappe.OutgoingEmailError:
             pass
+            
+     

@@ -1,0 +1,64 @@
+{
+ "actions": [],
+ "autoname": "autoincrement",
+ "creation": "2025-01-09 13:10:28.999268",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "document_name",
+  "user_email",
+  "status"
+ ],
+ "fields": [
+  {
+   "fieldname": "document_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Document Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "user_email",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "User Email",
+   "options": "User",
+   "reqd": 1
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "status",
+   "options": "Active\nInactive",
+   "reqd": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-01-11 13:43:11.841794",
+ "modified_by": "Administrator",
+ "module": "Admin IITI",
+ "name": "Note Sheets Email",
+ "naming_rule": "Autoincrement",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
