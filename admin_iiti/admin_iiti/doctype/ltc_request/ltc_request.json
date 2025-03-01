@@ -21,6 +21,7 @@
   "leave_from_date",
   "leave_to_date",
   "department",
+  "date_of_joining",
   "section_break_10",
   "specify_whether",
   "destination",
@@ -87,6 +88,7 @@
    "fieldname": "employee_name",
    "fieldtype": "Data",
    "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Employee Name",
    "reqd": 1
   },
@@ -430,6 +432,11 @@
    "fieldname": "section_break_38",
    "fieldtype": "Section Break",
    "label": "I undertake"
+  },
+  {
+   "fieldname": "date_of_joining",
+   "fieldtype": "Date",
+   "label": "Date of Joining"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -440,7 +447,7 @@
    "link_fieldname": "ltc_reference_number"
   }
  ],
- "modified": "2024-09-02 12:07:34.983049",
+ "modified": "2025-02-14 10:43:13.105081",
  "modified_by": "Administrator",
  "module": "Admin IITI",
  "name": "LTC Request",

@@ -289,11 +289,15 @@ class CustomLeaveApplication(Document):
     
     def validate_leave_balance(self):
         #int(self.leave_balance)
-        if self.leave_balance <= 0 and self.leave_type_name != 'Other Leave':
-            msg = _("Warning: Insufficient leave balance for Leave Type {0} in this allocation.").format(
-					frappe.bold(self.leave_type)
-				)
-            frappe.throw(msg)
+        if self.leave_type_name != 'Other Leave':
+            if self.leave_type == 'Leave Without Pay':
+                return
+            else:
+                if self.leave_balance <= 0:
+                    msg = _("Warning: Insufficient leave balance for Leave Type {0} in this allocation.").format(
+                        frappe.bold(self.leave_type)
+                        )
+                    frappe.throw(msg)
             
     def validate_leave_approver(self):
         if self.leave_approver == frappe.session.user:

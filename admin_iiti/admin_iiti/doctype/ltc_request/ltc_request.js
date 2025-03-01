@@ -53,13 +53,13 @@ frappe.ui.form.on('LTC Request', {
 			// 	frm.disable_form();
 			// }
 			if(frappe.user.has_role('HR Manager') || frm.doc.approver == logged_user){
-				if(frappe.session.user != 'hrmanager@iiti.ac.in'){
+				if(frappe.session.user != 'hrmanager@iiti.ac.in' && frappe.session.user !== 'Administrator'){
 					frm.disable_form();
 				}	
 			}
 			if(frappe.user.has_role('HR User') || frappe.user.has_role('HR Dealing Assistant')){
 				//frm.disable_form();
-				if(frappe.session.user != 'hrmanager@iiti.ac.in'){
+				if(frappe.session.user != 'hrmanager@iiti.ac.in' && frappe.session.user !== 'Administrator'){
 					frm.disable_save();
 				}
 			}
@@ -67,7 +67,7 @@ frappe.ui.form.on('LTC Request', {
 				frm.trigger('document_cancel');
 			}
 
-			if(frappe.session.user == 'hrmanager@iiti.ac.in' && frm.doc.status != 'Approve'){
+			if(frappe.session.user == 'hrmanager@iiti.ac.in' && frm.doc.status != 'Cancelled' && frm.doc.status != 'Sanction'){
 				frm.trigger('document_cancel');
 			}
 		}
@@ -108,14 +108,14 @@ frappe.ui.form.on('LTC Request', {
 				
 			}
 			if(frappe.user.has_role('HR Manager')){
-				if(frappe.session.user != 'hrmanager@iiti.ac.in'){
+				if(frappe.session.user != 'hrmanager@iiti.ac.in' && frappe.session.user !== 'Administrator'){
 					frm.disable_form();
 				}
 					
 			}
 			if(frappe.user.has_role('HR User')){
 				//frm.disable_form();
-				if(frappe.session.user != 'hrmanager@iiti.ac.in'){
+				if(frappe.session.user != 'hrmanager@iiti.ac.in' && frappe.session.user !== 'Administrator'){
 					frm.disable_save();
 				}
 			}
@@ -123,7 +123,7 @@ frappe.ui.form.on('LTC Request', {
 				frm.trigger('document_cancel');
 			}
 
-			if(frappe.session.user == 'hrmanager@iiti.ac.in' && frm.doc.status != 'Approve'){
+			if(frappe.session.user == 'hrmanager@iiti.ac.in' && frm.doc.status != 'Cancelled' && frm.doc.status != 'Sanction'){
 				frm.trigger('document_cancel');
 			}
 
