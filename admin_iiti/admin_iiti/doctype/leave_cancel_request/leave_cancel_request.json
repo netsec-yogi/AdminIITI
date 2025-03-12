@@ -26,6 +26,7 @@
   "approver",
   "total_leave_days",
   "status",
+  "reason",
   "follow_via_email",
   "doc_approved_date",
   "year",
@@ -85,20 +86,22 @@
    "fieldname": "from_date",
    "fieldtype": "Date",
    "hidden": 1,
-   "label": "From Date"
+   "label": "From Date",
+   "mandatory_depends_on": "eval:doc.leave_cancel_type"
   },
   {
    "fieldname": "to_date",
    "fieldtype": "Date",
    "hidden": 1,
-   "label": "To date"
+   "label": "To date",
+   "mandatory_depends_on": "eval:doc.leave_cancel_type"
   },
   {
    "fieldname": "total_leave_days",
    "fieldtype": "Data",
-   "hidden": 1,
    "label": "Total Leave Days",
-   "read_only": 1
+   "read_only": 1,
+   "reqd": 1
   },
   {
    "fieldname": "column_break_11",
@@ -109,14 +112,16 @@
    "fieldname": "leave_type",
    "fieldtype": "Data",
    "label": "Leave Type",
-   "read_only": 1
+   "read_only": 1,
+   "reqd": 1
   },
   {
    "fetch_from": "leave_application.leave_approver",
    "fieldname": "approver",
    "fieldtype": "Data",
    "label": "Approver",
-   "read_only": 1
+   "read_only": 1,
+   "reqd": 1
   },
   {
    "fieldname": "status",
@@ -174,12 +179,17 @@
    "fieldtype": "Data",
    "label": "Other Leave Name",
    "read_only": 1
+  },
+  {
+   "fieldname": "reason",
+   "fieldtype": "Small Text",
+   "label": "Reason For Cancellation"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-07-31 11:43:48.080772",
+ "modified": "2025-03-05 13:19:06.998011",
  "modified_by": "Administrator",
  "module": "Admin IITI",
  "name": "Leave cancel Request",

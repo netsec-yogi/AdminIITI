@@ -163,11 +163,14 @@ frappe.ui.form.on("Leave Application", {
 
 		if(frm.doc.leave_type == 'Casual Leave'){
 			frm.toggle_display("half_day",true);
+			frm.toggle_display("choose_session",true);
 		}else if(frm.doc.leave_type == 'Other Leave'){
 			frm.set_value('other_leave_type','');
 			frm.toggle_display("half_day",false);
+			frm.toggle_display("choose_session",false);
 		}else{
 			frm.toggle_display("half_day",false);
+			frm.toggle_display("choose_session",false);
 		}
 		
 		frm.trigger("calculate_total_days");

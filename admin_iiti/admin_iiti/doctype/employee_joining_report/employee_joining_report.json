@@ -8,6 +8,7 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "section_break_1",
   "employee",
   "employee_name",
   "column_break_3",
@@ -140,12 +141,17 @@
    "fieldtype": "Data",
    "label": "Leave Type",
    "read_only": 1
+  },
+  {
+   "description": "<h5 style=\"color: red;\"><b>Note:-Without leave approval, you cannot fill out the leave joining form. <b></b></b></h5>",
+   "fieldname": "section_break_1",
+   "fieldtype": "Section Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-05-04 14:49:51.057958",
+ "modified": "2025-03-07 11:33:36.931924",
  "modified_by": "Administrator",
  "module": "Admin IITI",
  "name": "Employee Joining Report",

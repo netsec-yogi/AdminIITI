@@ -289,7 +289,7 @@ class CustomLeaveApplication(Document):
     
     def validate_leave_balance(self):
         #int(self.leave_balance)
-        if self.leave_balance <= 0 and self.leave_type_name != 'Other Leave':
+        if int(self.leave_balance) <= 0 and self.leave_type_name != 'Other Leave':
             msg = _("Warning: Insufficient leave balance for Leave Type {0} in this allocation.").format(
 					frappe.bold(self.leave_type)
 				)
@@ -499,7 +499,7 @@ def notify_employee(self):
 
 @frappe.whitelist()
 def get_employee_data(user_id):
-    data = frappe.db.get_value('Employee', {'user_id':user_id}, ['department', 'designation','employee_id','employee_name'],as_dict =1)
+    data = frappe.db.get_value('Employee', {'user_id':user_id}, ['department', 'designation','employee_id','employee_name','cell_number'],as_dict =1)
     return data
 
 @frappe.whitelist()

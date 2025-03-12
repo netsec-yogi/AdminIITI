@@ -126,11 +126,11 @@ frappe.ui.form.on('Transport Allowance', {
         if (frm.doc.leave_application) {
             frappe.model.get_value('Leave Application', frm.doc.leave_application, ['from_date', 'to_date'], (r) => {
                 if (r) {
-                    frm.set_value('leave_form_date', r.from_date);
+                    frm.set_value('leave_from_date', r.from_date);
                     frm.set_value('leave_to_date', r.to_date);
 
                     // Make fields read-only if they have values
-                    frm.set_df_property('leave_form_date', 'read_only', r.from_date ? 1 : 0);
+                    frm.set_df_property('leave_from_date', 'read_only', r.from_date ? 1 : 0);
                     frm.set_df_property('leave_to_date', 'read_only', r.to_date ? 1 : 0);
                 }
             });

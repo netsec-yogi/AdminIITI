@@ -81,3 +81,69 @@ div.form-section-description {
   
     padding: 20px 15px;
 }
+
+
+.form-grid-container {
+    border: 1px solid #2490EF !important;  /* Blue border */
+    border-radius: 8px;  /* Smooth rounded edges */
+    padding: 12px;
+    background: #f9f9f9; /* Light gray background */
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1); /* Soft shadow */
+}
+
+/* Child Table Header */
+.grid-heading-row {
+    background: #D9EAFD !important;  
+    color: #891349 !important;  /* White text */
+    font-weight: bold;
+    padding: 10px;
+    border-radius: 6px 6px 0 0;  /* Rounded top corners */
+    text-transform: uppercase; /* Professional look */
+}
+
+/* Table Row Styling */
+.grid-body .grid-row {
+    background: white;  /* Clean white background */
+    border-bottom: 1px solid #e0e0e0 !important; /* Light gray separator */
+    transition: background 0.3s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+/* Alternating Row Colors */
+.grid-body .grid-row:nth-child(even) {
+    background: #f4f9ff; /* Light blue for better readability */
+}
+
+/* Hover Effect on Rows */
+.grid-body .grid-row:hover {
+    background: #e3f2ff !important;  /* Light blue on hover */
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* 'Add Row' Button */
+.grid-add-row {
+    background: #2490EF !important;  /* Blue button */
+    color: white !important;
+    border-radius: 5px;
+    padding: 6px 12px;
+    font-weight: bold;
+    transition: background 0.3s ease-in-out;
+}
+
+.grid-add-row:hover {
+    background: #1b7fd4 !important;  /* Darker blue on hover */
+}
+
+/* Delete Buttons */
+.grid-remove-rows, .grid-remove-all-rows {
+    background: #ff4d4d !important;  /* Red delete button */
+    color: white !important;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.grid-remove-rows:hover, .grid-remove-all-rows:hover {
+    background: #e60000 !important;  /* Darker red on hover */
+}
+.grid-empty{
+background-color: #9bc1dd;
+}

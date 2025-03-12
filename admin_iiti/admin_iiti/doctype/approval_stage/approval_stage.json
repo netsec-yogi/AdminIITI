@@ -10,7 +10,8 @@
   "approve_name",
   "department",
   "designation",
-  "status"
+  "status",
+  "action_status"
  ],
  "fields": [
   {
@@ -50,14 +51,21 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Status",
-   "options": "Open\nProcessed\nChecked\nRecommended\nSanction",
+   "options": "Open\nForwarded By Officer\nForwarded By Admin\nForwarded By RO\nProcessed\nChecked\nRecommended\nSanction\nApproved",
+   "reqd": 1
+  },
+  {
+   "fieldname": "action_status",
+   "fieldtype": "Select",
+   "label": "Action Status",
+   "options": "Open\nForwarded By Officer\nForwarded By Admin\nForwarded By RO\nProcessed\nChecked\nRecommended\nSanction\nApproved",
    "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-02-12 10:30:12.958893",
+ "modified": "2025-02-24 12:38:06.712819",
  "modified_by": "Administrator",
  "module": "Admin IITI",
  "name": "Approval Stage",

@@ -38,6 +38,17 @@ frappe.ui.form.on('Leave cancel Request', {
 		}
 		
 	},
+	employee: function(frm) {
+		frm.set_query("leave_application", function() {
+			console.log("employee",frm.doc.employee)
+			return {
+				filters: {
+					employee: frm.doc.employee, // Show only leave applications of the selected employee
+					status: "Approved"
+				}
+			};
+		});
+	},
 	onload: function(frm) {
 		let logged_user = frappe.session.user;
 		if (!frm.is_new()) {
@@ -87,6 +98,9 @@ frappe.ui.form.on('Leave cancel Request', {
 			frm.toggle_display("total_leave_days",true);
 			frm.set_value("from_date",leave_data.from_date);
 			frm.set_value("to_date",leave_data.to_date);
+			// frm.set_df_property('from_date', 'reqd', 1);
+			// frm.set_df_property('to_date', 'reqd', 1);
+			// frm.set_df_property('total_leave_days', 'reqd', 1);
 			frm.trigger("calculate_leave_day");
 			leave_cancel_display_data(frm,leave_data);
 			
