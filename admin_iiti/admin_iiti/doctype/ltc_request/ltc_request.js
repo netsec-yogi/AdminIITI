@@ -49,9 +49,7 @@ frappe.ui.form.on('LTC Request', {
 					.css({ 'color': '#ffffff', 'font-weight': 'bold', 'background-color': 'red' });
 			}
 
-			// if(frappe.session.user == frm.doc.owner){
-			// 	frm.disable_form();
-			// }
+			
 			if(frappe.user.has_role('HR Manager') || frm.doc.approver == logged_user){
 				if(frappe.session.user != 'hrmanager@iiti.ac.in' && frappe.session.user !== 'Administrator'){
 					frm.disable_form();
