@@ -27,14 +27,14 @@ frappe.ui.form.on("Leave Application", {
 	},
 	refresh:function(frm){
 		let logged_user = frappe.session.user;
-		if(frappe.session.user != 'hrmanager@iiti.ac.in'){
+		if(frappe.session.user != 'hrmanager@iiti.ac.in' ){
 			
 			frm.disable_save();
 		}else{
 			console.log("ytrtyty");
 			frm.toggle_display('status',true);
 			frm.toggle_display('follow_via_email',true);
-			frm.set_df_property("status", "read_only", 0);
+			//frm.set_df_property("status", "read_only", 0);
 		}
 		if (!frm.is_new()) {
 			if(frm.doc.status == 'Rejected'){
@@ -71,7 +71,7 @@ frappe.ui.form.on("Leave Application", {
 			console.log("ffff");
 			frm.toggle_display('status',true);
 			frm.toggle_display('follow_via_email',true);
-			frm.set_df_property("status", "read_only", 0);
+			//frm.set_df_property("status", "read_only", 0);
 		}
 		if (!frm.is_new()) {
 			frm.toggle_display('submit_form',false);
@@ -165,16 +165,14 @@ frappe.ui.form.on("Leave Application", {
 		if(frm.doc.leave_type == 'Casual Leave'){
 			frm.toggle_display("half_day",true);
 			frm.toggle_display("choose_session",true);
-			frm.set_df_property('choose_session', 'reqd', 1);
 		}else if(frm.doc.leave_type == 'Other Leave'){
 			frm.set_value('other_leave_type','');
 			frm.toggle_display("half_day",false);
 			frm.toggle_display("choose_session",false);
-			frm.set_df_property('choose_session', 'reqd', 0);
 		}else{
+			frm.set_value('total_leave_days','');
 			frm.toggle_display("half_day",false);
 			frm.toggle_display("choose_session",false);
-			frm.set_df_property('choose_session', 'reqd', 0);
 		}
 		
 		frm.trigger("calculate_total_days");

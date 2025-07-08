@@ -301,7 +301,22 @@ class CustomLeaveApplication(Document):
             
     def validate_leave_approver(self):
         if self.leave_approver == frappe.session.user:
-            frappe.throw("Invalid leave approver name selected.")            
+            frappe.throw("Invalid leave approver name selected.")
+            
+    def get_total_leaves_on_half_day(self):
+        leave_count_on_half_day_date = frappe.db.sql(
+            """select count(name) from `tabLeave Application`
+            where employee = %(employee)s
+            and docstatus < 2
+            and status in ('Open', 'Approved')
+            and half_day = 1
+            and half_day_date = %(half_day_date)s
+            and name != %(name)s""",
+            {"employee": self.employee, "half_day_date": self.half_day_date, "name": self.name},
+        )[0][0]
+        
+        
+        return leave_count_on_half_day_date * 0.5       
 
 @frappe.whitelist()
 def get_approvers(doctype, txt, searchfield, start, page_len, filters):

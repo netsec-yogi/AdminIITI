@@ -1,0 +1,68 @@
+{
+ "actions": [],
+ "autoname": "autoincrement",
+ "creation": "2025-03-23 16:40:14.864115",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "from_date",
+  "to_date",
+  "designation",
+  "pay_level",
+  "mode_of_promotion"
+ ],
+ "fields": [
+  {
+   "fieldname": "from_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "From Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "to_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "To Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "designation",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Designation",
+   "options": "Designation",
+   "reqd": 1
+  },
+  {
+   "fieldname": "pay_level",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Pay Level",
+   "options": "Pay Level",
+   "reqd": 1
+  },
+  {
+   "fieldname": "mode_of_promotion",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Mode of Promotion",
+   "options": "Direct recruitment\nPromotion\nFinancial upgradation",
+   "reqd": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-03-23 16:45:45.567734",
+ "modified_by": "Administrator",
+ "module": "Admin IITI",
+ "name": "Promotion Chart",
+ "naming_rule": "Autoincrement",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

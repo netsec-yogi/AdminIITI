@@ -13,4 +13,13 @@ frappe.listview_settings['Employee Joining Report'] = {
 			return [__("Open"), "red", "status,=,Open"];
 		}
 	},
+
+	onload: function(listview) {
+        if(frappe.session.user != 'Administrator'){
+            frappe.set_route('List', 'Employee Joining Report','List');
+            frappe.route_options = {
+                status: ''
+            }
+        }
+	}, 
 };
