@@ -297,7 +297,21 @@ class CustomLeaveApplication(Document):
             
     def validate_leave_approver(self):
         if self.leave_approver == frappe.session.user:
-            frappe.throw("Invalid leave approver name selected.")            
+            frappe.throw("Invalid leave approver name selected.")
+            
+    def get_total_leaves_on_half_day(self):
+        leave_count_on_half_day_date = frappe.db.sql(
+            """select count(name) from `tabLeave Application`
+            where employee = %(employee)s
+            and docstatus < 2
+            and status in ('Open', 'Approved')
+            and half_day = 1
+            and half_day_date = %(half_day_date)s
+            and name != %(name)s""",
+            {"employee": self.employee, "half_day_date": self.half_day_date, "name": self.name},
+        )[0][0]
+        
+        return leave_count_on_half_day_date * 0.5      
 
 @frappe.whitelist()
 def get_approvers(doctype, txt, searchfield, start, page_len, filters):
@@ -566,3 +580,47 @@ def leave_discussion_email_send(contant,email_id,doctype,docname):
             "message_to":email_id,
             "subject":email_template.subject + " " + docname,
         })
+        
+@frappe.whitelist()
+def get_number_of_leave_days(
+	employee: str,
+	leave_type: str,
+	from_date: str,
+	to_date: str,
+	half_day: Optional[int] = None,
+	half_day_date: Optional[str] = None,
+	holiday_list: Optional[str] = None,
+) -> float:
+	"""Returns number of leave days between 2 dates after considering half day and holidays
+	(Based on the include_holiday setting in Leave Type)"""
+	number_of_days = 0
+	if cint(half_day) == 1:
+		if getdate(from_date) == getdate(to_date):
+			number_of_days = 0.5
+		elif half_day_date and getdate(from_date) <= getdate(half_day_date) <= getdate(to_date):
+			number_of_days = date_diff(to_date, from_date) + 0.5
+		else:
+			number_of_days = date_diff(to_date, from_date) + 1
+	else:
+		number_of_days = date_diff(to_date, from_date) + 1
+
+	if not frappe.db.get_value("Leave Type", leave_type, "include_holiday"):
+		number_of_days = flt(number_of_days) - flt(
+			get_holidays(employee, from_date, to_date, holiday_list=holiday_list)
+		)
+	return number_of_days
+
+@frappe.whitelist()
+def get_holidays(employee, from_date, to_date, holiday_list=None):
+	"""get holidays between two dates for the given employee"""
+	if not holiday_list:
+		holiday_list = get_holiday_list_for_employee(employee)
+
+	holidays = frappe.db.sql(
+		"""select count(distinct holiday_date) from `tabHoliday` h1, `tabHoliday List` h2
+		where h1.parent = h2.name and h1.holiday_date between %s and %s
+		and h2.name = %s""",
+		(from_date, to_date, holiday_list),
+	)[0][0]
+
+	return holidays

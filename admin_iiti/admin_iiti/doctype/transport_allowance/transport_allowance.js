@@ -6,7 +6,7 @@ frappe.ui.form.on('Transport Allowance', {
 		let logged_user = frappe.session.user;
 		if(frm.doc.i_confirm && frappe.session.user != 'Administrator'){
 			frm.disable_form();
-			frm.fields_dict['your_fieldname'].$wrapper.find('input').addClass('custom-css-class');
+			//frm.fields_dict['your_fieldname'].$wrapper.find('input').addClass('custom-css-class');
 		}
 
 		if(!frm.is_new()){
@@ -94,7 +94,7 @@ frappe.ui.form.on('Transport Allowance', {
                 ['employee_name', 'department', 'pay_level', 'designation', 'pnt_number','salutation'], (r) => {
                 console.log("Fetched Employee Data:", r);
                 if (r) {
-                    frm.set_value('employee_name',r.salutation+''+r.employee_name);
+                    frm.set_value('employee_name',r.salutation+'. '+r.employee_name);
                     frm.set_value('department', r.department);
                     frm.set_value('pay_level', r.pay_level);
                     frm.set_value('designation', r.designation);

@@ -127,8 +127,7 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "Open\nApproved\nRejected\nNot Approved",
-   "read_only": 1
+   "options": "Open\nApproved\nRejected\nNot Approved"
   },
   {
    "default": "1",
@@ -189,7 +188,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-03-05 13:19:06.998011",
+ "modified": "2025-05-14 12:59:48.271671",
  "modified_by": "Administrator",
  "module": "Admin IITI",
  "name": "Leave cancel Request",

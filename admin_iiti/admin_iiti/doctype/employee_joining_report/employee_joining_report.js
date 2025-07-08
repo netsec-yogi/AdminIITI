@@ -11,7 +11,7 @@ frappe.ui.form.on('Employee Joining Report', {
 			}
 		}
 		if (frm.is_new()) {
-			
+			frm.set_value('status','Open');
 		}else if(!frm.is_new()){
 			if(frappe.session.user == 'hrmanager@iiti.ac.in'){
 				frm.toggle_display("status",true);
@@ -52,7 +52,7 @@ frappe.ui.form.on('Employee Joining Report', {
 	},
 	onload: function(frm) {
 		if (frm.is_new()) {
-			
+			frm.set_value('status','Open');
 		}else if(!frm.is_new()){
 			if(frappe.session.user == 'hrmanager@iiti.ac.in'){
 				frm.toggle_display("status",true);

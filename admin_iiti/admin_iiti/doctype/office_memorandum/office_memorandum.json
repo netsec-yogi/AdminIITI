@@ -27,7 +27,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Note Sheet",
-   "options": "\nTransport Allowance\nOutside Position",
+   "options": "\nTransport Allowance",
    "reqd": 1
   },
   {
@@ -51,7 +51,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-04-03 17:09:17.083458",
+ "modified": "2025-07-02 18:31:32.426619",
  "modified_by": "Administrator",
  "module": "Admin IITI",
  "name": "Office Memorandum",

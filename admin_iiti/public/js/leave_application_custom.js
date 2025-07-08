@@ -28,7 +28,6 @@ frappe.ui.form.on("Leave Application", {
 	refresh:function(frm){
 		let logged_user = frappe.session.user;
 		if(frappe.session.user == 'hrmanager@iiti.ac.in' || frappe.session.user == 'Administrator'){
-			frm.set_df_property("status", "read_only", 0);
 			frm.toggle_display('status',true);
 			frm.toggle_display('follow_via_email',true);
 		}else{
@@ -64,8 +63,6 @@ frappe.ui.form.on("Leave Application", {
 	onload: function(frm) {
 		let logged_user = frappe.session.user;
 		if(frappe.session.user == 'hrmanager@iiti.ac.in' || frappe.session.user == 'Administrator'){
-			
-			frm.set_df_property("status", "read_only", 0);
 			frm.toggle_display('status',true);
 			frm.toggle_display('follow_via_email',true);
 		}else{
@@ -169,6 +166,8 @@ frappe.ui.form.on("Leave Application", {
 			frm.toggle_display("half_day",false);
 			frm.toggle_display("choose_session",false);
 		}else{
+			frm.set_value('total_leave_days','')
+			frm.set_value('half_day','');
 			frm.toggle_display("half_day",false);
 			frm.toggle_display("choose_session",false);
 		}

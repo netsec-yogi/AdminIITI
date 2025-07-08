@@ -11,7 +11,8 @@
   "department",
   "designation",
   "status",
-  "action_status"
+  "action_status",
+  "status_label_name"
  ],
  "fields": [
   {
@@ -51,21 +52,27 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Status",
-   "options": "Open\nForwarded By Officer\nForwarded By Admin\nForwarded By RO\nProcessed\nChecked\nRecommended\nSanction\nApproved",
+   "options": "Open\nForwarded By CVO\nForwarded By Officer\nForwarded By Admin\nForwarded By RO\nProcessed\nChecked\nRecommended\nSanction\nApproved",
    "reqd": 1
   },
   {
    "fieldname": "action_status",
    "fieldtype": "Select",
    "label": "Action Status",
-   "options": "Open\nForwarded By Officer\nForwarded By Admin\nForwarded By RO\nProcessed\nChecked\nRecommended\nSanction\nApproved",
+   "options": "Open\nForwarded By CVO\nForwarded By Officer\nForwarded By Admin\nForwarded By RO\nProcessed\nChecked\nRecommended\nSanction\nApproved",
    "reqd": 1
+  },
+  {
+   "fieldname": "status_label_name",
+   "fieldtype": "Select",
+   "label": "Status Label Name",
+   "options": "Open\nForward\nProceed\nCheck\nRecommend\nSanction\nApprove"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-02-24 12:38:06.712819",
+ "modified": "2025-07-08 16:28:58.474716",
  "modified_by": "Administrator",
  "module": "Admin IITI",
  "name": "Approval Stage",

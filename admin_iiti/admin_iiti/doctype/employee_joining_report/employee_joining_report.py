@@ -176,7 +176,16 @@ def get_leave_data(employee):
 			d.name for d in Joining_data
 		]
     
-    leave_data = frappe.db.get_list('Leave Application',fields = ["name"],filters=[['name','not in',joining_array],['status','=',"Approved"],["employee","=",employee],['leave_type','not in',['Casual Leave']]])
+    leave_data = frappe.db.get_list(
+        'Leave Application',
+        fields = ["name"],
+        filters=[
+            ['name','not in',joining_array],
+            ['status','in',["Approved","Amended"]],
+            ["employee","=",employee],
+            ['leave_type','not in',['Casual Leave']]
+            ]
+    )
     
     leave_array = [
 			l.name for l in leave_data

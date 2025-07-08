@@ -41,6 +41,13 @@ class TransportAllowance(Document):
                         self.share_doc_user(ad.approver_email)
                         self.notify_document(ad.approver_email, 1)
                         
+    def on_submit(self):
+        if self.status == 'Approved':
+            employee = frappe.get_doc("Employee",self.employee)
+            if employee and employee.user_id:
+                self.share_doc_user(employee.user_id)
+            
+                        
     def share_doc_user(doc, user):
         if not frappe.has_permission(doc=doc, ptype="submit", user=user):
             frappe.share.add_docshare(doc.doctype, doc.name, user, submit=1, flags={"ignore_share_permission": True})
@@ -53,7 +60,7 @@ class TransportAllowance(Document):
             args = parent_doc.as_dict()
 
             if flags == 1:
-                template = 'Note Sheet Approval for open'
+                template = 'Transport Allowance Notification'
             else:
                 template = ''
 
@@ -66,7 +73,7 @@ class TransportAllowance(Document):
         self.notify({
             "message": message,
             "message_to": email_id,
-            "subject": email_template.subject + " " + self.employee_name
+            "subject": email_template.subject + " " + self.name +"Pending Your Recommendation/Approval",
         })
         
         

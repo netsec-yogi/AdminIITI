@@ -73,7 +73,8 @@
    "fieldname": "leave_application",
    "fieldtype": "Link",
    "label": "Leave Application",
-   "options": "Leave Application"
+   "options": "Leave Application",
+   "reqd": 1
   },
   {
    "fieldname": "pay_level",
@@ -112,9 +113,9 @@
   },
   {
    "fieldname": "month_of_tpta",
-   "fieldtype": "Select",
+   "fieldtype": "Table MultiSelect",
    "label": "Month for which TPTA is not admissible",
-   "options": "January\nFebruary\nMarch\nApril\nMay\nJune\nJuly\nAugust\nSeptember\nOctober\nNovember\nDecember"
+   "options": "TPTA Month"
   },
   {
    "default": "Draft",
@@ -138,7 +139,7 @@
    "label": "<b>I Confirm</b>"
   },
   {
-   "description": "<h5><b>Attention: Once the checkbox is selected, further editing of the form is restricted.</b></h5>",
+   "description": "<h5 style=\"color: red;\"><b>Attention: Once the checkbox is selected, further editing of the form is restricted.</b></h5>",
    "fieldname": "section_break_15",
    "fieldtype": "Section Break"
   },
@@ -164,7 +165,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-02-21 15:42:08.871869",
+ "modified": "2025-07-07 18:00:13.021818",
  "modified_by": "Administrator",
  "module": "Admin IITI",
  "name": "Transport Allowance",

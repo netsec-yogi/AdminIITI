@@ -6,18 +6,11 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "request_no",
   "position_applied_for",
-  "location_applied_to"
+  "location_applied_to",
+  "yearmonth"
  ],
  "fields": [
-  {
-   "fieldname": "request_no",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "Request No.",
-   "reqd": 1
-  },
   {
    "fieldname": "position_applied_for",
    "fieldtype": "Data",
@@ -31,12 +24,19 @@
    "in_list_view": 1,
    "label": "Location Applied To",
    "reqd": 1
+  },
+  {
+   "fieldname": "yearmonth",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Year/Month",
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-02-19 10:23:31.829969",
+ "modified": "2025-05-16 12:41:46.439362",
  "modified_by": "Administrator",
  "module": "Admin IITI",
  "name": "Outside Position Previous Applications",

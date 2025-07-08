@@ -1,0 +1,3 @@
+div.page-head.flex.drop-shadow {
+    top: var(--navbar-height) !important;
+  }

@@ -32,7 +32,10 @@ class OfficeMemorandum(Document):
         if email_id:
             parent_doc = frappe.get_doc(self.notesheet_name,self.document_name)
             args = parent_doc.as_dict()
-            template = 'Office Memorandum'
+            if self.notesheet_name == 'Transport Allowance':
+                template = 'Office Memorandum for transport allowance'
+            else:
+                template = ''
             
             if not template:
                 frappe.msgprint(frappe._("Please set default template for Office Memorandum."))
@@ -53,7 +56,7 @@ class OfficeMemorandum(Document):
             notify(self,{
 				"message":message,
 				"message_to":email_id,
-				"subject":email_template.subject +" "+ self.name,
+				"subject":email_template.subject +" "+ self.notesheet_name,
 				})
             
 @frappe.whitelist()

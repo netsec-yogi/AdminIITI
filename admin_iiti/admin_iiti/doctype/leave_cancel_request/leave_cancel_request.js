@@ -3,13 +3,10 @@
 
 frappe.ui.form.on('Leave cancel Request', {
 	setup:function(frm){
-		if(frm.is_new()){
-			var today = new Date();
-			var yyyy = today.getFullYear();
-			cur_frm.set_value("year",yyyy);
-		}
+		frm.trigger("year");
 	},
 	refresh: function(frm) {
+		frm.trigger("year");
 		let logged_user = frappe.session.user;
 		if (!frm.doc.employee && frappe.defaults.get_user_permissions()) {
 			const perm = frappe.defaults.get_user_permissions();
@@ -22,6 +19,11 @@ frappe.ui.form.on('Leave cancel Request', {
 			cur_frm.set_df_property("total_leave_days","read_only",0);
 		}
 		if (!frm.is_new()) {
+			if(frappe.session.user == 'hrmanager@iiti.ac.in'){
+				frm.toggle_display("follow_via_email",true);
+				cur_frm.set_df_property("total_leave_days","read_only",0);
+				frm.set_df_property('status', 'options', ['Open', 'Approved', 'Not Approved'])
+			}
 			if(logged_user == frm.doc.approver && frm.doc.status == 'Open'){
 				frm.disable_form();
 				frm.add_custom_button(__('Approve'), function () {
@@ -36,6 +38,15 @@ frappe.ui.form.on('Leave cancel Request', {
 				}).addClass("btn-danger").css({ 'color': '#ffffff', 'font-weight': 'bold', 'background-color': 'red' })
 			}
 		}
+		// if(frm.doc.leave_application){
+		// 	var leave_data = get_leave_application(frm);
+		// 	frm.set_value("leave_type",leave_data.leave_type);
+		// 	frm.set_value("from_date",leave_data.from_date);
+		// 	frm.set_value("to_date",leave_data.to_date);
+		// 	frm.set_value("total_leave_days",leave_data.total_leave_days);
+		// 	frm.trigger("calculate_leave_day");
+		// 	leave_cancel_display_data(frm,leave_data);
+		// }
 		
 	},
 	employee: function(frm) {
@@ -44,7 +55,7 @@ frappe.ui.form.on('Leave cancel Request', {
 			return {
 				filters: {
 					employee: frm.doc.employee, // Show only leave applications of the selected employee
-					status: "Approved"
+					status: "Approved"  
 				}
 			};
 		});
@@ -52,12 +63,11 @@ frappe.ui.form.on('Leave cancel Request', {
 	onload: function(frm) {
 		let logged_user = frappe.session.user;
 		if (!frm.is_new()) {
-			if (!frm.is_new()) {
-				if(frappe.session.user == 'hrmanager@iiti.ac.in'){
-					frm.toggle_display("follow_via_email",true);
-					cur_frm.set_df_property("total_leave_days","read_only",0);
-					frm.set_df_property('status', 'options', ['Open', 'Approved', 'Not Approved'])
-				}
+
+			if(frappe.session.user == 'hrmanager@iiti.ac.in'){
+				frm.toggle_display("follow_via_email",true);
+				cur_frm.set_df_property("total_leave_days","read_only",0);
+				frm.set_df_property('status', 'options', ['Open', 'Approved', 'Not Approved'])
 			}
 			frm.toggle_display("from_date",true);
 			frm.toggle_display("to_date",true);
@@ -84,6 +94,7 @@ frappe.ui.form.on('Leave cancel Request', {
 			return {
 				filters: {
 					status: 'Approved',
+					employee: frm.doc.employee,
 					//leave_type: ['not in', 'Other Leave']
 				},
 			}
@@ -98,9 +109,9 @@ frappe.ui.form.on('Leave cancel Request', {
 			frm.toggle_display("total_leave_days",true);
 			frm.set_value("from_date",leave_data.from_date);
 			frm.set_value("to_date",leave_data.to_date);
-			// frm.set_df_property('from_date', 'reqd', 1);
-			// frm.set_df_property('to_date', 'reqd', 1);
-			// frm.set_df_property('total_leave_days', 'reqd', 1);
+			frm.set_df_property('from_date', 'reqd', 1);
+			frm.set_df_property('to_date', 'reqd', 1);
+			frm.set_df_property('total_leave_days', 'reqd', 1);
 			frm.trigger("calculate_leave_day");
 			leave_cancel_display_data(frm,leave_data);
 			
@@ -141,8 +152,15 @@ frappe.ui.form.on('Leave cancel Request', {
 				}
 			});
 		}
+	},
+	year:function(frm){
+		if(frm.is_new()){
+			var today = new Date();
+			var yyyy = today.getFullYear();
+			console.log("yyyy",yyyy);
+			cur_frm.set_value("year",yyyy);
+		}
 	}
-
 });
 function get_leave_application(frm) {
 	let details = []

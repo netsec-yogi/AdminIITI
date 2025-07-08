@@ -38,14 +38,17 @@ frappe.ui.form.on('Note Sheet Approval Process', {
         }
 
         frm.refresh_field("approval_stage");
-        hide_add_row_button(frm); // Hide Add Row after updating
+        if(frappe.session.user != 'Administrator'){
+            hide_add_row_button(frm);
+        }
+        // Hide Add Row after updating
     }
 });
 
 // Function to hide the Add Row button instantly
 function hide_add_row_button(frm) {
-    frm.fields_dict['approval_stage'].grid.wrapper.find('.grid-add-row').remove();
-    frm.fields_dict['approval_stage'].grid.wrapper.find('.grid-footer').remove();
+    //frm.fields_dict['approval_stage'].grid.wrapper.find('.grid-add-row').remove();
+    //frm.fields_dict['approval_stage'].grid.wrapper.find('.grid-footer').remove();
 }
 
 

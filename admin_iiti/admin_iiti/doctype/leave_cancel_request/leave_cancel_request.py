@@ -46,7 +46,7 @@ class LeavecancelRequest(Document):
             else:
                 leave_application_data = frappe.get_value("Leave Application", {"name": self.leave_application},["*"],as_dict=1)
                 
-                total_amended_leaves = int(leave_application_data.total_leave_days)-int(self.total_leave_days)
+                total_amended_leaves = float(leave_application_data.total_leave_days)-float(self.total_leave_days)
                 
                 if self.leave_type == 'Half Paid Leave':
                     total_amended_leave = total_amended_leaves * 2

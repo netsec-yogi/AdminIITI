@@ -14,6 +14,8 @@ app_license = "MIT"
 # app_include_css = "/assets/admin_iiti/css/admin_iiti.css"
 # app_include_js = "/assets/admin_iiti/js/admin_iiti.js"
 app_include_js = "/assets/admin_iiti/js/custom_side_menu.js"
+app_include_css = "/assets/admin_iiti/css/custom.css"
+
 
 # include js, css files in header of web template
 # web_include_css = "/assets/admin_iiti/css/admin_iiti.css"

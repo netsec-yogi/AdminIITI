@@ -22,6 +22,9 @@ frappe.listview_settings['Outside Position'] = {
 		else if (doc.status === "Forwarded By Admin"){
             return [__("Forwarded By Admin"), "cyan", "status,=,Forwarded By Admin"];
         }
+		else if (doc.status === "Forwarded By CVO"){
+            return [__("Forwarded By CVO"), "cyan", "status,=,Forwarded By CVO"];
+        }
 		else if (doc.status === "Forwarded By RO"){
             return [__("Forwarded By RO"), "Blue", "status,=,Forwarded By RO"];
         }

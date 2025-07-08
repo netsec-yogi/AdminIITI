@@ -22,6 +22,9 @@ from frappe.model.document import Document
 from frappe.model.naming import getseries
 
 class OutsidePosition(Document):
+    def validate(self):
+        if self.is_new():
+            self.approval_email()
     def autoname(self):
         current_year = getdate(today()).year
         prefix = f"IIT-Admin-OPR-{current_year}"
@@ -34,18 +37,34 @@ class OutsidePosition(Document):
             
     def on_update(self):
         if self.terms_and_conditions:
-            if self.reporting_officer_name and self.status == 'Open':
-                self.share_doc_user_withwrite(self.reporting_officer_name)
-                self.notify_document(self.reporting_officer_name, 1)
+            if self.reporting_officer and self.status == 'Open':
+                self.share_with_reporting_officer()
+            if self.reviewing_officer_name and not self.reporting_officer and (self.status == 'Forwarded By Reporting Officer' or self.status == 'Open'):
+                self.share_doc_user_withwrite(self.reviewing_officer_name)
+                self.notify_document(self.reviewing_officer_name, 1)
                 
             if self.status != 'Open':
                 approval_data = frappe.get_doc("Note Sheet Approval Process",self.doctype,as_dict = 1)
-                if approval_data.approval_stage:
+                if approval_data and approval_data.approval_stage:
                     for ad in approval_data.approval_stage:
                         if ad.status == self.status:
                             self.share_doc_user(ad.approver_email)
                             self.notify_document(ad.approver_email, 1)
-                            
+                else:
+                    frappe.msgprint(frappe._("Please set default template for Note Sheet Approval."))
+        self.reload()
+        
+    def on_submit(self):
+        if self.status == 'Approved':
+            self.share_doc_user(self.user_id)
+            self.update_employee_profile()
+            
+    def share_with_reporting_officer(self):
+        for r in self.reporting_officer:
+            if r.status == 'Open':
+                self.notify_document(r.recommender)
+                self.share_doc_user_withwrite(r.recommender)
+        
     def share_doc_user_withwrite(doc, user):
         if not frappe.has_permission(doc=doc, ptype="write", user=user):
             frappe.share.add_docshare(doc.doctype, doc.name, user, write=1, flags={"ignore_share_permission": True})
@@ -79,7 +98,12 @@ class OutsidePosition(Document):
             "message_to": email_id,
             "subject": email_template.subject + " " + self.employee_name
         })
-        
+    
+    def approval_email(self):
+        if self.reviewing_officer_name:
+            if self.reviewing_officer_name == frappe.session.user:
+                frappe.throw(frappe._("You cannot select yourself as reviewing Officer."))
+                
     def notify(self, args):
         args = frappe._dict(args)
         if cint(self.follow_via_email):
@@ -102,6 +126,19 @@ class OutsidePosition(Document):
                     frappe.msgprint(_("Email sent to {0}").format(contact))
                 except frappe.OutgoingEmailError:
                     pass
+    
+    def update_employee_profile(self):
+        if self.employee:
+            child = frappe.new_doc("Outside Position Previous Applications")  # Replace with the actual child table Doctype name
+            child.parent = self.employee
+            child.parenttype = "Employee"
+            child.parentfield = "application_for_noc"  # Confirm fieldname in the Employee Doctype
+            child.position_applied_for = self.position_applying_for
+            child.location_applied_to = self.location_of_the_position
+            child.yearmonth = getdate(self.application_submission_date).strftime("%Y-%m")
+            child.insert(ignore_permissions=True)
+            
+            frappe.db.commit()
                 
 @frappe.whitelist()
 def update_outside_position_status(doctype, document_name, status, user):

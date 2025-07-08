@@ -147,3 +147,9 @@ div.form-section-description {
 .grid-empty{
 background-color: #9bc1dd;
 }
+/* 
+div.page-head.flex.drop-shadow {
+    top: var(--navbar-height) !important;
+  } */
+
+  
