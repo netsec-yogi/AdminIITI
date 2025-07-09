@@ -518,7 +518,7 @@ def notify_employee(self):
 
 @frappe.whitelist()
 def get_employee_data(user_id):
-    data = frappe.db.get_value('Employee', {'user_id':user_id}, ['department', 'designation','employee_id','employee_name'],as_dict =1)
+    data = frappe.db.get_value('Employee', {'user_id':user_id}, ['department', 'designation','employee_id','employee_name','cell_number'],as_dict =1)
     return data
 
 @frappe.whitelist()
@@ -585,3 +585,47 @@ def leave_discussion_email_send(contant,email_id,doctype,docname):
             "message_to":email_id,
             "subject":email_template.subject + " " + docname,
         })
+        
+@frappe.whitelist()
+def get_number_of_leave_days(
+	employee: str,
+	leave_type: str,
+	from_date: str,
+	to_date: str,
+	half_day: Optional[int] = None,
+	half_day_date: Optional[str] = None,
+	holiday_list: Optional[str] = None,
+) -> float:
+	"""Returns number of leave days between 2 dates after considering half day and holidays
+	(Based on the include_holiday setting in Leave Type)"""
+	number_of_days = 0
+	if cint(half_day) == 1:
+		if getdate(from_date) == getdate(to_date):
+			number_of_days = 0.5
+		elif half_day_date and getdate(from_date) <= getdate(half_day_date) <= getdate(to_date):
+			number_of_days = date_diff(to_date, from_date) + 0.5
+		else:
+			number_of_days = date_diff(to_date, from_date) + 1
+	else:
+		number_of_days = date_diff(to_date, from_date) + 1
+
+	if not frappe.db.get_value("Leave Type", leave_type, "include_holiday"):
+		number_of_days = flt(number_of_days) - flt(
+			get_holidays(employee, from_date, to_date, holiday_list=holiday_list)
+		)
+	return number_of_days
+
+@frappe.whitelist()
+def get_holidays(employee, from_date, to_date, holiday_list=None):
+	"""get holidays between two dates for the given employee"""
+	if not holiday_list:
+		holiday_list = get_holiday_list_for_employee(employee)
+
+	holidays = frappe.db.sql(
+		"""select count(distinct holiday_date) from `tabHoliday` h1, `tabHoliday List` h2
+		where h1.parent = h2.name and h1.holiday_date between %s and %s
+		and h2.name = %s""",
+		(from_date, to_date, holiday_list),
+	)[0][0]
+
+	return holidays

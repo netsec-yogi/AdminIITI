@@ -3,13 +3,10 @@
 
 frappe.ui.form.on('Leave cancel Request', {
 	setup:function(frm){
-		if(frm.is_new()){
-			var today = new Date();
-			var yyyy = today.getFullYear();
-			cur_frm.set_value("year",yyyy);
-		}
+		frm.trigger("year");
 	},
 	refresh: function(frm) {
+		frm.trigger("year");
 		let logged_user = frappe.session.user;
 		if(frm.is_new()){
 			var today = new Date();
@@ -28,10 +25,10 @@ frappe.ui.form.on('Leave cancel Request', {
 		}
 		if (!frm.is_new()) {
 			if(frappe.session.user == 'hrmanager@iiti.ac.in'){
-					frm.toggle_display("follow_via_email",true);
-					cur_frm.set_df_property("total_leave_days","read_only",0);
-					frm.set_df_property('status', 'options', ['Open', 'Approved', 'Not Approved'])
-				}
+				frm.toggle_display("follow_via_email",true);
+				cur_frm.set_df_property("total_leave_days","read_only",0);
+				frm.set_df_property('status', 'options', ['Open', 'Approved', 'Not Approved'])
+			}
 			if(logged_user == frm.doc.approver && frm.doc.status == 'Open'){
 				frm.disable_form();
 				frm.add_custom_button(__('Approve'), function () {
@@ -71,12 +68,11 @@ frappe.ui.form.on('Leave cancel Request', {
 	onload: function(frm) {
 		let logged_user = frappe.session.user;
 		if (!frm.is_new()) {
-			if (!frm.is_new()) {
-				if(frappe.session.user == 'hrmanager@iiti.ac.in'){
-					frm.toggle_display("follow_via_email",true);
-					cur_frm.set_df_property("total_leave_days","read_only",0);
-					frm.set_df_property('status', 'options', ['Open', 'Approved', 'Not Approved'])
-				}
+
+			if(frappe.session.user == 'hrmanager@iiti.ac.in'){
+				frm.toggle_display("follow_via_email",true);
+				cur_frm.set_df_property("total_leave_days","read_only",0);
+				frm.set_df_property('status', 'options', ['Open', 'Approved', 'Not Approved'])
 			}
 			frm.toggle_display("from_date",true);
 			frm.toggle_display("to_date",true);
@@ -103,6 +99,7 @@ frappe.ui.form.on('Leave cancel Request', {
 			return {
 				filters: {
 					status: 'Approved',
+					employee: frm.doc.employee,
 					//leave_type: ['not in', 'Other Leave']
 				},
 			}
@@ -160,8 +157,15 @@ frappe.ui.form.on('Leave cancel Request', {
 				}
 			});
 		}
+	},
+	year:function(frm){
+		if(frm.is_new()){
+			var today = new Date();
+			var yyyy = today.getFullYear();
+			console.log("yyyy",yyyy);
+			cur_frm.set_value("year",yyyy);
+		}
 	}
-
 });
 function get_leave_application(frm) {
 	let details = []

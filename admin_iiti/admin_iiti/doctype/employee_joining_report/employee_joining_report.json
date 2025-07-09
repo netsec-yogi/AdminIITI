@@ -8,6 +8,7 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "section_break_1",
   "employee",
   "employee_name",
   "column_break_3",
@@ -138,6 +139,11 @@
    "fieldtype": "Data",
    "label": "Leave Type",
    "read_only": 1
+  },
+  {
+   "description": "<h5 style=\"color: red;\"><b>Note:-Without leave approval, you cannot fill out the leave joining form. <b></b></b></h5>",
+   "fieldname": "section_break_1",
+   "fieldtype": "Section Break"
   }
  ],
  "index_web_pages_for_search": 1,
