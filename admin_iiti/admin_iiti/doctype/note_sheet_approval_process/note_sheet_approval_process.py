@@ -11,10 +11,13 @@ import frappe
 
 @frappe.whitelist()
 def get_employee_data(user_id):
-    employee = frappe.get_value("Employee", {"user_id": user_id}, ["department", "designation"], as_dict=True)
+    employee = frappe.get_value("Employee", {"user_id": user_id}, ['department', 'designation','employee_id','employee_name','salutation'], as_dict=True)
     if employee:
         return {
             "department": employee.get("department", ""),
-            "designation": employee.get("designation", "")
+            "designation": employee.get("designation", ""),
+            "employee_id": employee.get("employee_id", ""),
+            "employee_name": employee.get("employee_name", ""),
+            "salutation": employee.get("salutation", "")
         }
     return {}

@@ -60,6 +60,7 @@ frappe.ui.form.on('Approval Stage', {
             let approver_details = get_approver_data(row.approver_email);
             
             if (approver_details) {
+                row.approve_name = approver_details.salutation+'. '+approver_details.employee_name
                 row.department = approver_details.department || '';
                 row.designation = approver_details.designation || '';
                 frm.refresh_field('approval_stage');

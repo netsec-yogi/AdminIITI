@@ -42,21 +42,25 @@ class OfficeMemorandum(Document):
                 return
             
             email_template = frappe.get_doc("Email Template",template)
-            message = frappe.render_template(email_template.response_html,args)
+            message = frappe.render_template(email_template.response_html,args)  
+                
             attachments = []
             # List of document types and names you want to attach
             #attachment = frappe.attach_print(self.notesheet_name, self.document_name, file_name=self.document_name)
             #attachments.append(attachment)
             
             if self.notesheet_name == 'Transport Allowance':
-                pass
+                subject = f"{email_template.subject} {args.get('employee_name', '')}, {args.get('designation', '')} - regarding"
                 #attachment = frappe.attach_print(self.notesheet_name, self.document_name, file_name=self.document_name,print_format='Transport Allowance OM')
                 #attachments.append(attachment)
+            else:
+                subject = f"{email_template.subject} {self.notesheet_name}"
                 
             notify(self,{
 				"message":message,
 				"message_to":email_id,
-				"subject":email_template.subject +" "+ self.notesheet_name,
+				"subject":subject,
+                #"attachments":attachments
 				})
             
 @frappe.whitelist()
