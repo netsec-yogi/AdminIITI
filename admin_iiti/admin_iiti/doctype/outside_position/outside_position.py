@@ -91,13 +91,13 @@ class OutsidePosition(Document):
                 frappe.msgprint(frappe._("Please set default template for Note Sheet Approval."))
                 return
 
-        email_template = frappe.get_doc("Email Template", template)
-        message = frappe.render_template(email_template.response_html, args)
-        self.notify({
-            "message": message,
-            "message_to": email_id,
-            "subject": email_template.subject + " " + self.employee_name
-        })
+            email_template = frappe.get_doc("Email Template", template)
+            message = frappe.render_template(email_template.response_html, args)
+            self.notify({
+                "message": message,
+                "message_to": email_id,
+                "subject": email_template.subject + " " + self.employee_name
+            })
     
     def approval_email(self):
         if self.reviewing_officer_name:
@@ -147,9 +147,25 @@ def update_outside_position_status(doctype, document_name, status, user):
         doc = frappe.get_doc(doctype,document_name)
         self = doc
         frappe.db.set_value(doctype, {'name': document_name},{'status': status},update_modified=False)
+        employee = frappe.get_doc("Employee", {'user_id':user},as_dict = 1,ignore_permission = True)
+        if employee:
+            salutation = employee.salutation or ""
+            emp_name = employee.employee_name or ""
+            designation = employee.designation or "N/A"
+            department = employee.department or "N/A"
+        else:
+            # Fallbacks if employee not found
+            salutation = ""
+            emp_name = get_fullname(user)  # fallback to user's full name
+            designation = "Not Available"
+            department = "Not Available"
+        
         if status != 'Approved':
             approver = {
                 "comment": "Recommend By " + get_fullname(frappe.session.user),
+                "approve_name": salutation + "." + emp_name if salutation else emp_name,
+                "designation":designation,
+                "department":department,
                 "status":status,
                 "email": user,
                 "datetime": str(current_date_time)  # Ensure datetime is in string format
@@ -157,6 +173,9 @@ def update_outside_position_status(doctype, document_name, status, user):
         else:
             approver = {
                 "comment": "Approved By " + get_fullname(frappe.session.user),
+                "approve_name":employee.salutation +"." + employee.employee_name,
+                "designation":employee.designation,
+                "department":employee.department,
                 "status":status,
                 "email": user,
                 "datetime": str(current_date_time)  # Ensure datetime is in string format
