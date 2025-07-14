@@ -68,13 +68,13 @@ class TransportAllowance(Document):
                 frappe.msgprint(frappe._("Please set default template for Note Sheet Approval."))
                 return
 
-        email_template = frappe.get_doc("Email Template", template)
-        message = frappe.render_template(email_template.response_html, args)
-        self.notify({
-            "message": message,
-            "message_to": email_id,
-            "subject": email_template.subject + " " +self.employee_name +"," + self.designation + " - regarding",
-        })
+            email_template = frappe.get_doc("Email Template", template)
+            message = frappe.render_template(email_template.response_html, args)
+            self.notify({
+                "message": message,
+                "message_to": email_id,
+                "subject": email_template.subject + " " +self.employee_name +"," + self.designation + " - regarding",
+            })
         
         
     def notify(self, args):

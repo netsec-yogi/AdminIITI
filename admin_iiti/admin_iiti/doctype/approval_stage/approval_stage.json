@@ -12,7 +12,10 @@
   "designation",
   "status",
   "action_status",
-  "status_label_name"
+  "status_label_name",
+  "is_forwarded_to",
+  "forwarded_user",
+  "forwarded_status"
  ],
  "fields": [
   {
@@ -51,14 +54,14 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Status",
-   "options": "Open\nForwarded By CVO\nForwarded By Officer\nForwarded By Admin\nForwarded By RO\nProcessed\nChecked\nRecommended\nSanction\nApproved",
+   "options": "Open\nForwarded By CVO\nForwarded By Officer\nForwarded By Admin\nForwarded By RO\nForwarded By DOA\nProcessed\nChecked\nRecommended\nSanction\nApproved",
    "reqd": 1
   },
   {
    "fieldname": "action_status",
    "fieldtype": "Select",
    "label": "Action Status",
-   "options": "Open\nForwarded By CVO\nForwarded By Officer\nForwarded By Admin\nForwarded By RO\nProcessed\nChecked\nRecommended\nSanction\nApproved",
+   "options": "Open\nForwarded By CVO\nForwarded By Officer\nForwarded By Admin\nForwarded By RO\nForwarded By DOA\nProcessed\nChecked\nRecommended\nSanction\nApproved",
    "reqd": 1
   },
   {
@@ -66,12 +69,32 @@
    "fieldtype": "Select",
    "label": "Status Label Name",
    "options": "Open\nForward\nProceed\nCheck\nRecommend\nSanction\nApprove"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_forwarded_to",
+   "fieldtype": "Check",
+   "label": "Is forwarded to"
+  },
+  {
+   "depends_on": "eval:doc.is_forwarded_to == 1",
+   "fieldname": "forwarded_user",
+   "fieldtype": "Link",
+   "label": "Forwarded User",
+   "options": "User"
+  },
+  {
+   "depends_on": "eval:doc.is_forwarded_to == 1",
+   "fieldname": "forwarded_status",
+   "fieldtype": "Select",
+   "label": "Forwarded Status",
+   "options": "\nForwarded By RO\nForwarded By DOA\nRecommended\nApproved"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-07-09 11:16:48.445055",
+ "modified": "2025-07-11 11:13:28.866577",
  "modified_by": "Administrator",
  "module": "Admin IITI",
  "name": "Approval Stage",

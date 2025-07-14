@@ -16,11 +16,20 @@ frappe.listview_settings['Outside Position'] = {
 		}else if (doc.status === "Open"){
             return [__("Open"), "red", "status,=,Open"];
         }
+		else if (doc.status === "Forwarded By Reporting Officer"){
+            return [__("Forwarded By Reporting Officer"), "yellow", "status,=,Forwarded By OfForwarded By Reporting Officer"];
+        }
 		else if (doc.status === "Forwarded By Officer"){
             return [__("Forwarded By Officer"), "pink", "status,=,Forwarded By Officer"];
         }
 		else if (doc.status === "Forwarded By Admin"){
             return [__("Forwarded By Admin"), "cyan", "status,=,Forwarded By Admin"];
+        }
+		else if (doc.status === "Forwarded By RO"){
+            return [__("Forwarded By RO"), "pink", "status,=,Forwarded By RO"];
+        }
+		else if (doc.status === "Forwarded By DOA"){
+            return [__("Forwarded By DOA"), "cyan", "status,=,Forwarded By DOA"];
         }
 		else if (doc.status === "Forwarded By CVO"){
             return [__("Forwarded By CVO"), "cyan", "status,=,Forwarded By CVO"];

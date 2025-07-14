@@ -45,14 +45,13 @@ class OfficeMemorandum(Document):
             message = frappe.render_template(email_template.response_html,args)  
                 
             attachments = []
-            # List of document types and names you want to attach
-            #attachment = frappe.attach_print(self.notesheet_name, self.document_name, file_name=self.document_name)
-            #attachments.append(attachment)
-            
+        
             if self.notesheet_name == 'Transport Allowance':
                 subject = f"{email_template.subject} {args.get('employee_name', '')}, {args.get('designation', '')} - regarding"
-                #attachment = frappe.attach_print(self.notesheet_name, self.document_name, file_name=self.document_name,print_format='Transport Allowance OM')
-                #attachments.append(attachment)
+                attachment_one = frappe.attach_print(self.notesheet_name, self.document_name, file_name=self.document_name,print_format='Custom Transport Allowance')
+                attachments.append(attachment_one)
+                attachment_two = frappe.attach_print(self.doctype, self.name, file_name=self.name,print_format='Transport Allowance OM')
+                attachments.append(attachment_two)
             else:
                 subject = f"{email_template.subject} {self.notesheet_name}"
                 
@@ -60,7 +59,7 @@ class OfficeMemorandum(Document):
 				"message":message,
 				"message_to":email_id,
 				"subject":subject,
-                #"attachments":attachments
+                "attachments":attachments
 				})
             
 @frappe.whitelist()
@@ -83,7 +82,7 @@ def notify(self, args):
                 sender=sender["email"],
                 subject=args.subject,
                 message=args.message,
-                # attachments=args.attachments,
+                attachments=args.attachments,
             )
             frappe.msgprint(frappe._("Email sent to {0}").format(contact))
         except frappe.OutgoingEmailError:
