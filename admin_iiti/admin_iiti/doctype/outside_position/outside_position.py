@@ -55,9 +55,8 @@ class OutsidePosition(Document):
         
     def on_submit(self):
         if self.status == 'Approved':
-            self.share_doc_user(self.user_id)
+            #self.share_doc_user(self.user_id)
             self.update_employee_profile()
-            
             
     def administrative_approver_share(self):
         approval_data = frappe.get_doc("Note Sheet Approval Process",self.doctype,as_dict = 1)
@@ -295,3 +294,65 @@ def update_outside_position_status(doctype, document_name, status, user):
             doc.submit()
         
         return status
+    
+@frappe.whitelist()
+def update_reject_status(doctype, document_name, status, user):
+    if status == 'Rejected':
+        current_date_time = frappe.utils.now_datetime()
+        doc = frappe.get_doc(doctype,document_name)
+        self = doc
+        #frappe.db.set_value(doctype, {'name': document_name},{'status': status},update_modified=False)
+        employee = frappe.get_doc("Employee", {'user_id':user},as_dict = 1,ignore_permission = True)
+        
+        if employee:
+            salutation = employee.salutation or ""
+            emp_name = employee.employee_name or ""
+            designation = employee.designation or "N/A"
+            department = employee.department or "N/A"
+        else:
+            # Fallbacks if employee not found
+            salutation = ""
+            emp_name = get_fullname(user)  # fallback to user's full name
+            designation = "Not Available"
+            department = "Not Available"
+            
+        approver = {
+            "comment": "Rejected By " + get_fullname(frappe.session.user),
+            "approve_name": salutation + "." + emp_name if salutation else emp_name,
+            "designation":designation,
+            "department":department,
+            "status":status,
+            "email": user,
+            "datetime": str(current_date_time)  # Ensure datetime is in string format
+        }
+        
+        if doc.approver_details:
+            try:
+                approver_list = json.loads(doc.approver_details)
+            except json.JSONDecodeError:
+                approver_list = []
+        else:
+            approver_list = []
+        
+        # Append the new approver
+        approver_list.append(approver)
+        
+        self.approver_details = json.dumps(approver_list)
+        self.status = status
+        #frappe.throw(frappe.as_json(self))
+        doc.save()
+        
+        return status
+    
+@frappe.whitelist()
+def cancel_noc_document(docname, doctype, reason):
+	doc = frappe.get_doc(doctype, docname)
+
+	# Allow cancellation even if not submitted
+	if hasattr(doc, "status"):
+		doc.status = "Cancelled"
+
+	# Save changes
+	doc.save(ignore_permissions=True)
+	frappe.db.commit()
+	return {"status": "cancelled"}
