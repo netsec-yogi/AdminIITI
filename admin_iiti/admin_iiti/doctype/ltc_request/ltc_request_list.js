@@ -1,6 +1,16 @@
 frappe.listview_settings['LTC Request'] = {
 	add_fields: ["leave_type", "employee", "employee_name"],
 	has_indicator_for_draft: 1,
+	onload: function(listview) {
+
+        if(frappe.session.user != 'Administrator'){
+            frappe.set_route('List', 'Transport Allowance','List');
+            frappe.route_options = {
+                status: '',
+				employee_name:'',
+            }
+        }
+	},
 	get_indicator: function (doc) {
 		if (doc.status === "Approved") {
 			return [__("Approved"), "green", "status,=,Approved"];

@@ -36,22 +36,21 @@ class OutsidePosition(Document):
             self.name = f"IITI/Admin/PNT-{x}/{current_year}/{x}"
             
     def on_update(self):
+        #frappe.throw(frappe.as_json(self))
         if self.terms_and_conditions:
             if self.reporting_officer and self.status == 'Open':
                 self.share_with_reporting_officer()
+                
+            if self.status == 'Forwarded By Reporting Officer' and self.reviewing_officer_name:
+                self.share_doc_user_withwrite(self.reviewing_officer_name)
+                self.notify_document(self.reviewing_officer_name,1)
+                                
             if self.reviewing_officer_name and not self.reporting_officer and (self.status == 'Forwarded By Reporting Officer' or self.status == 'Open'):
                 self.share_doc_user_withwrite(self.reviewing_officer_name)
-                self.notify_document(self.reviewing_officer_name, 1)
+                self.notify_document(self.reviewing_officer_name,1)
                 
-            if self.status != 'Open':
-                approval_data = frappe.get_doc("Note Sheet Approval Process",self.doctype,as_dict = 1)
-                if approval_data and approval_data.approval_stage:
-                    for ad in approval_data.approval_stage:
-                        if ad.status == self.status:
-                            self.share_doc_user(ad.approver_email)
-                            self.notify_document(ad.approver_email, 1)
-                else:
-                    frappe.msgprint(frappe._("Please set default template for Note Sheet Approval."))
+            if self.status == 'Forwarded By Officer':
+                self.administrative_approver_share()
         self.reload()
         
     def on_submit(self):
@@ -59,10 +58,19 @@ class OutsidePosition(Document):
             self.share_doc_user(self.user_id)
             self.update_employee_profile()
             
+            
+    def administrative_approver_share(self):
+        approval_data = frappe.get_doc("Note Sheet Approval Process",self.doctype,as_dict = 1)
+        if approval_data and approval_data.approval_stage:
+            for ad in approval_data.approval_stage:
+                if ad.status == self.status:
+                    self.share_doc_user(ad.approver_email)
+                    self.notify_document(ad.approver_email,1)
+                    
     def share_with_reporting_officer(self):
         for r in self.reporting_officer:
             if r.status == 'Open':
-                self.notify_document(r.recommender)
+                self.notify_document(r.recommender,1)
                 self.share_doc_user_withwrite(r.recommender)
         
     def share_doc_user_withwrite(doc, user):
@@ -96,7 +104,7 @@ class OutsidePosition(Document):
             self.notify({
                 "message": message,
                 "message_to": email_id,
-                "subject": email_template.subject + " " + self.employee_name
+                "subject": email_template.subject + " " +self.employee_name +"," + self.designation + " - regarding",
             })
     
     def approval_email(self):
@@ -139,7 +147,88 @@ class OutsidePosition(Document):
             child.insert(ignore_permissions=True)
             
             frappe.db.commit()
-                
+            
+@frappe.whitelist()
+def update_reporting_officer_status(doctype, document_name, status, user):
+    current_date_time = frappe.utils.now_datetime()
+    doc = frappe.get_doc(doctype, document_name)
+
+    if status == 'Forwarded By Reporting Officer':
+        updated = False
+        for row in doc.reporting_officer:
+            if row.recommender == user:
+                row.status = 'Recommended'
+                row.docstatus = 1
+                row.recommend_date_time = current_date_time
+                updated = True
+                break
+
+        if updated:
+            doc.save(ignore_permissions=True)
+
+            # Check if all recommenders have recommended
+            recommended_count = sum(1 for row in doc.reporting_officer if row.status == 'Recommended')
+            total_recommender_count = len(doc.reporting_officer)
+
+            if recommended_count == total_recommender_count:
+                doc.status = 'Forwarded By Reporting Officer'
+                doc.save(ignore_permissions=True)
+                return 'Forwarded By Reporting Officer'
+
+    return 'Open'
+
+@frappe.whitelist()
+def update_forwared_user_status(doctype, document_name, status, user,forwared_user):
+    if forwared_user:
+        current_date_time = frappe.utils.now_datetime()
+        doc = frappe.get_doc(doctype,document_name)
+        self = doc
+        frappe.db.set_value(doctype, {'name': document_name},{'status': status},update_modified=False)
+        employee = frappe.get_doc("Employee", {'user_id':user},as_dict = 1,ignore_permission = True)
+        if employee:
+            salutation = employee.salutation or ""
+            emp_name = employee.employee_name or ""
+            designation = employee.designation or "N/A"
+            department = employee.department or "N/A"
+        else:
+            # Fallbacks if employee not found
+            salutation = ""
+            emp_name = get_fullname(user)  # fallback to user's full name
+            designation = "Not Available"
+            department = "Not Available"
+            
+        approver = {
+            "comment": "Forwared By " + get_fullname(frappe.session.user),
+            "approve_name": salutation + "." + emp_name if salutation else emp_name,
+            "designation":designation,
+            "department":department,
+            "status":status,
+            "email": user,
+            "datetime": str(current_date_time)  # Ensure datetime is in string format
+        }
+        # Ensure approver_details is a list (handling JSON)
+        if doc.approver_details:
+            try:
+                approver_list = json.loads(doc.approver_details)
+            except json.JSONDecodeError:
+                approver_list = []
+        else:
+            approver_list = []
+            
+        # Append the new approver
+        approver_list.append(approver)
+        
+        self.approver_details = json.dumps(approver_list)
+        self.status = status
+        self.share_doc_user(forwared_user)
+        self.notify_document(forwared_user,1)
+        
+        doc.save(ignore_permissions=True)
+        frappe.db.commit()
+        
+        return status
+    
+        
 @frappe.whitelist()
 def update_outside_position_status(doctype, document_name, status, user):
     if user:
@@ -199,8 +288,60 @@ def update_outside_position_status(doctype, document_name, status, user):
         # frappe.throw(frappe.as_json(self))
         
         if status != 'Approved':
+            self.administrative_approver_share()
             doc.save(ignore_permissions=True)
+            self.reload()
         else:
             doc.submit()
+        
+        return status
+
+
+@frappe.whitelist()
+def update_reject_status(doctype, document_name, status, user):
+    if status == 'Rejected':
+        current_date_time = frappe.utils.now_datetime()
+        doc = frappe.get_doc(doctype,document_name)
+        self = doc
+        #frappe.db.set_value(doctype, {'name': document_name},{'status': status},update_modified=False)
+        employee = frappe.get_doc("Employee", {'user_id':user},as_dict = 1,ignore_permission = True)
+        
+        if employee:
+            salutation = employee.salutation or ""
+            emp_name = employee.employee_name or ""
+            designation = employee.designation or "N/A"
+            department = employee.department or "N/A"
+        else:
+            # Fallbacks if employee not found
+            salutation = ""
+            emp_name = get_fullname(user)  # fallback to user's full name
+            designation = "Not Available"
+            department = "Not Available"
+            
+        approver = {
+            "comment": "Rejected By " + get_fullname(frappe.session.user),
+            "approve_name": salutation + "." + emp_name if salutation else emp_name,
+            "designation":designation,
+            "department":department,
+            "status":status,
+            "email": user,
+            "datetime": str(current_date_time)  # Ensure datetime is in string format
+        }
+        
+        if doc.approver_details:
+            try:
+                approver_list = json.loads(doc.approver_details)
+            except json.JSONDecodeError:
+                approver_list = []
+        else:
+            approver_list = []
+        
+        # Append the new approver
+        approver_list.append(approver)
+        
+        self.approver_details = json.dumps(approver_list)
+        self.status = status
+        #frappe.throw(frappe.as_json(self))
+        doc.save()
         
         return status

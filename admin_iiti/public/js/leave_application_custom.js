@@ -548,6 +548,7 @@ frappe.ui.form.on('Leave Recommender', 'recommender', function (frm, cdt, cdn) {
 		cur_frm.clear_table('leave_recommenders');
 	}
 	let data = employee_data(val.recommender);
+	val.recommender_name = data.salutation+'. '+data.employee_name;
 	val.department = data.department;
 	val.designation = data.designation;	
 	frm.refresh_field("leave_recommenders");

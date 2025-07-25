@@ -518,7 +518,7 @@ def notify_employee(self):
 
 @frappe.whitelist()
 def get_employee_data(user_id):
-    data = frappe.db.get_value('Employee', {'user_id':user_id}, ['department', 'designation','employee_id','employee_name','cell_number'],as_dict =1)
+    data = frappe.db.get_value('Employee', {'user_id':user_id}, ['department', 'designation','employee_id','employee_name','cell_number','salutation'],as_dict =1)
     return data
 
 @frappe.whitelist()

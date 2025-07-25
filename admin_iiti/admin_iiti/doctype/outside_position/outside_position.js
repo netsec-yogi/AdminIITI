@@ -17,7 +17,10 @@ frappe.ui.form.on('Outside Position', {
 		}
         frappe.require("/assets/admin_iiti/css/outsidePosition.css");
         if(frm.doc.terms_and_conditions && !frappe.user.has_role("HR Admin")){
-			frm.disable_form();
+			//frm.disable_form();
+			frm.disable_save();
+			frm.set_df_property('terms_and_conditions', 'read_only', 1);
+
 		}
 
         if(!frm.is_new()){
@@ -26,7 +29,8 @@ frappe.ui.form.on('Outside Position', {
 			if(reporting_officer){
 				reporting_officer.forEach(function (list,index) {
 
-					if(list.recommender != reviewing_officer){
+					if(list.recommender == frappe.session.user && list.recommender != reviewing_officer && frm.doc.terms_and_conditions && list.status == 'Open'){
+						frm.trigger("default_remark_button_create");
 						frm.add_custom_button(__('Recommend'), function () {
 							let action_type = 'Forwarded By Reporting Officer';
 							change_status_reporting_officer(frm,action_type,logged_user);
@@ -35,18 +39,19 @@ frappe.ui.form.on('Outside Position', {
 					}
 				});
 			}
-            if(reviewing_officer == frappe.session.user && frm.doc.status == 'Open'){
+            if(reviewing_officer == frappe.session.user && (frm.doc.status == 'Forwarded By Reporting Officer' || frm.doc.status == 'Open')){
                 frm.add_custom_button(__('Recommend'), function () {
                     let action_type = 'Forwarded By Officer';
                     change_status_outside_position(frm,action_type,logged_user);
 
                 }).addClass("btn-primary").css({ 'color': '#ffffff', 'font-weight': 'bold', 'background-color': '#2490ef' });
+				frm.trigger("default_remark_button_create");
 
-                frm.add_custom_button(__('Reject'), function () {
-                    let action_type = 'Rejected';
-                    change_status_outside_position(frm, action_type, logged_user);
+                // frm.add_custom_button(__('Reject'), function () {
+                //     let action_type = 'Rejected';
+                //     change_status_outside_position_reject(frm, action_type, logged_user);
     
-                }).addClass("btn-danger").css({ 'color': '#ffffff', 'font-weight': 'bold', 'background-color': 'red' })
+                // }).addClass("btn-danger").css({ 'color': '#ffffff', 'font-weight': 'bold', 'background-color': 'red' })
             }
 			let approver_details = get_approver_list(frm);
             const colors = ["#2490ef", "#28a745", "#6495ed", "#28a745", "#17a2b8"]; // Define color options
@@ -55,44 +60,40 @@ frappe.ui.form.on('Outside Position', {
 				approver_details.forEach(function (list,index) {
 					if(list.status == frm.doc.status && frappe.session.user === list.approver_email){
                         let button_color = colors[index % colors.length];
+						frm.trigger("default_remark_button_create");
 						frm.add_custom_button(__(list.status_label_name), function () {
 							let action_type = list.action_status
 							change_status_outside_position(frm,action_type,logged_user);
 		
 						}).addClass("btn-primary").css({ 'color': '#ffffff', 'font-weight': 'bold', 'background-color': button_color });
+
+						if(list.is_forwarded_to){
+							frm.add_custom_button(__('Forword'), function () {
+							let action_type = list.forwarded_status;
+							let forwared_user = list.forwarded_user;
+							change_status_forwared_message(frm,action_type,logged_user,forwared_user);
+		
+							}).addClass("btn-primary").css({ 'color': '#ffffff', 'font-weight': 'bold', 'background-color': '#9928a7' });
+						}
 		
 					}
-                    // else if(list.status == 'Processed' && frappe.session.user == list.approver_email && frm.doc.status == 'Processed'){
-					// 	frm.add_custom_button(__('Checked'), function () {
-					// 		let action_type = 'Checked';
-					// 		change_status_outside_position(frm,action_type,logged_user);
-		
-					// 	}).addClass("btn-primary").css({ 'color': '#ffffff', 'font-weight': 'bold', 'background-color': '#2490ef' });
-		
-		
-					// }else if( list.status == 'Checked' && frappe.session.user == list.approver_email && frm.doc.status == 'Checked'){
-					// 	frm.add_custom_button(__('Recommend'), function () {
-					// 		let action_type = 'Recommended';
-					// 		change_status_outside_position(frm, action_type,logged_user);
-					// 	}).addClass("btn-primary").css({ 'color': '#ffffff', 'font-weight': 'bold', 'background-color': '#6495ed' });
-					// }else if (list.status == 'Recommended' && frappe.session.user == list.approver_email && frm.doc.status == 'Recommended'){
-
-					// 	frm.add_custom_button(__('Approve'), function () {
-					// 		let action_type = 'Approved';
-					// 		change_status_outside_position(frm, action_type,logged_user);
-					// 	}).addClass("btn-primary").css({ 'color': '#ffffff', 'font-weight': 'bold', 'background-color': '#28a745' });
-					// }
-	
 				});
 			}
 			
+		}else{
+            frm.set_value('year', new Date().getFullYear());
 		}
     },
 
     onload:function(frm){
-        //frm.trigger("employee");
+        if(frm.is_new()){
+			frm.set_value('year', new Date().getFullYear());
+		}
         if(frm.doc.terms_and_conditions && !frappe.user.has_role("HR Admin")){
-			frm.disable_form();
+			//frm.disable_form();
+			frm.disable_save();
+			frm.set_df_property('terms_and_conditions', 'read_only', 1);
+
 		}
 		let user_list = [frappe.session.user];
 		frm.fields_dict.reviewing_officer_name.get_query = function(doc) {
@@ -170,6 +171,11 @@ frappe.ui.form.on('Outside Position', {
             fields.forEach(field => frm.set_value(field, null));
         }
     },
+	default_remark_button_create:function(frm){
+		frm.add_custom_button(__("Remark For Approval/Recommendation"), function () {
+			frm.trigger("approver_remark");
+		}).addClass("btn-info").css({ 'color': '#ffffff', 'font-weight': 'bold', 'background-color': '#333c44' });
+	},
 
 	reviewing_officer_name: function (frm) {
         if (frm.doc.reviewing_officer_name) {
@@ -208,19 +214,92 @@ frappe.ui.form.on('Outside Position', {
 		}
 		
 	},
+
+	basic_pay:function(frm){
+		if (frm.doc.basic_pay){
+			// Validate the contact number format
+			if (!/^\d+$/.test(frm.doc.basic_pay)) {
+				frappe.show_alert(__('Basic Pay should be numeric'));
+				frm.set_value('basic_pay', '');
+			}
+		}
+	},
+	position_applying_for:function(frm){
+		const field_value = frm.doc.position_applying_for;
+        if (!/^[A-Za-z\s]+$/.test(field_value)) {
+            frappe.show_alert(__('Only letters and spaces are allowed in the field: Position Applying For ',));
+            frappe.validated = false;
+			frm.set_value('position_applying_for', '');
+        }
+	},
+	location_of_the_position:function(frm){
+		const field_value = frm.doc.location_of_the_position;
+        if (!/^[A-Za-z\s]+$/.test(field_value)) {
+            frappe.show_alert(__('Only letters and spaces are allowed in the field: Applying For (Organization/Institude) ',));
+            frappe.validated = false;
+			frm.set_value('location_of_the_position', '');
+        }
+	},
+	reviewing_officer_contact:function(frm){
+		if(frm.doc.reviewing_officer_contact){
+			if (!/^\d+$/.test(frm.doc.reviewing_officer_contact)) {
+				frappe.show_alert(__('Basic Pay should be numeric'));
+				frm.set_value('reviewing_officer_contact', '');
+			}
+		}
+	},
+	approver_remark:function(frm){
+		var d = new frappe.ui.Dialog({
+			title: __('Remark'),
+			fields: [
+				{
+					"fieldname": "remark",
+					"fieldtype": "Text",
+					"reqd": 1,
+				}
+			],
+			primary_action_label: __('Save'),
+			primary_action: function() {
+				var data = d.get_values();
+				let remark = 'Remark: ' + data.remark;
+	
+				frappe.call({
+					method: "frappe.desk.form.utils.add_comment",
+					args: {
+						reference_doctype: frm.doc.doctype,
+						reference_name: frm.doc.name,
+						content: __(remark),
+						comment_email: frappe.session.user,
+						comment_by: frappe.session.user_fullname
+					},
+					callback: function(r) {
+						if(!r.exc) {
+							frappe.show_alert("Remark added successfully");
+							d.hide();
+							cur_frm.reload_doc();
+						}
+					}
+				});
+			}
+		});
+		d.show();
+	},
 });
 
 frappe.ui.form.on('Leave Recommender', 'recommender', function (frm, cdt, cdn) {
 	var val = locals[cdt][cdn];
 	if(val.recommender == frappe.session.user){
-		frappe.msgprint("invalid Recommender selected");
+		frappe.msgprint("Invalid Recommender selected");
 		val.recommender = ""
-		cur_frm.clear_table('reviewing_officer');
+		cur_frm.clear_table('reporting_officer');
 	}
 	let data = employee_data(val.recommender);
-	val.department = data.department;
-	val.designation = data.designation;	
-	frm.refresh_field("reviewing_officer");
+	if(data){
+		val.recommender_name = data.salutation+'. '+data.employee_name;
+		val.department = data.department;
+		val.designation = data.designation;	
+		frm.refresh_field("reporting_officer");
+	}
 
 });
 
@@ -260,6 +339,57 @@ function get_approver_list (frm){
 	return data;
 }
 
+function change_status_reporting_officer(frm,action_type,logged_user){
+	frappe.call({
+		method: "admin_iiti.admin_iiti.doctype.outside_position.outside_position.update_reporting_officer_status",
+		async: true,
+		args: {
+			doctype :frm.doc.doctype,
+			document_name: frm.doc.name,
+			status: action_type,
+			user: logged_user,
+		},
+		callback: function (r) {
+			let data = r.message;
+			if(data){
+				cur_frm.set_value('status',data);
+				console.log("D",data);
+				// if(data == 'Open'){
+				// 	frm.reload_doc();
+				// }
+				//recommender_status_update(frm, child_doc_status)
+				recommender_comment_post(frm,action_type,user);
+				frm.reload_doc();
+				frm.refresh();
+				frappe.show_alert("Thank you for recommended the NOC Request. ");
+
+			}
+			
+		
+		}
+	});
+}
+
+function recommender_status_update(frm, child_doc_status){
+	frm.refresh_field("reporting_officer");
+	let recommender = frm.doc.reporting_officer;
+	let datetime = frappe.datetime.now_datetime();
+	console.log("recommender",recommender);
+	if (recommender.length > 0) {
+		recommender.forEach(function (i, d) {
+			if (i.recommender == frappe.session.user && i.status == 'Open') {
+				var val = recommender[d];
+				val.status = child_doc_status;
+				val.recommend_date_time = datetime;
+				val.docstatus = 1;
+			}
+		});
+		cur_frm.refresh_field('reporting_officer');
+	} else {
+		cur_frm.clear_table('reporting_officer');
+	}
+}
+
 function change_status_outside_position(frm,action_type,user){
 	frappe.call({
 		method: "admin_iiti.admin_iiti.doctype.outside_position.outside_position.update_outside_position_status",
@@ -279,6 +409,147 @@ function change_status_outside_position(frm,action_type,user){
 				frm.reload_doc();
 				recommender_comment_post(frm,action_type,user);
 				//frm.refresh();
+			}
+			
+		
+		}
+	});
+}
+
+function change_status_forwared_message(frm, action_type, user, forwared_user) {
+	frappe.db.get_value('User', forwared_user, 'full_name')
+		.then(res => {
+			let full_name = res.message.full_name || forwared_user;
+
+			var d = new frappe.ui.Dialog({
+				title: __('Remark'),
+				fields: [
+					{
+						fieldname: "employee_name",
+						fieldtype: "Data",
+						label: "Forwarded To",
+						default: full_name,
+						read_only: 1
+					},
+					{
+						fieldname: "remark",
+						fieldtype: "Text",
+						label: "Remark",
+						reqd: 1
+					}
+				],
+				primary_action_label: __('Forward'),
+				primary_action: function () {
+					let data = d.get_values();
+					let remark = 'Remark: ' + data.remark;
+
+					frappe.call({
+						method: "frappe.desk.form.utils.add_comment",
+						args: {
+							reference_doctype: frm.doc.doctype,
+							reference_name: frm.doc.name,
+							content: __(remark),
+							comment_email: frappe.session.user,
+							comment_by: frappe.session.user_fullname
+						},
+						callback: function (r) {
+							if (!r.exc) {
+								change_status_forwared_user(frm, action_type, user, forwared_user);
+								d.hide();
+								cur_frm.reload_doc();
+							}
+						}
+					});
+				}
+			});
+
+			d.show();
+		});
+}
+
+
+function change_status_forwared_user(frm,action_type,user,forwared_user){
+	frappe.call({
+		method: "admin_iiti.admin_iiti.doctype.outside_position.outside_position.update_forwared_user_status",
+		async: true,
+		args: {
+			doctype :frm.doc.doctype,
+			document_name: frm.doc.name,
+			status: action_type,
+			user: user,
+			forwared_user:forwared_user
+		},
+		callback: function (r) {
+			let data = r.message;
+			if(data){
+				cur_frm.set_value('status',data);
+				//cur_frm.save();
+				//window.reload();
+				frm.reload_doc();
+				recommender_comment_post(frm,action_type,user);
+				//frm.refresh();
+			}
+			
+		
+		}
+	});
+}
+
+function change_status_outside_position_reject(frm, action_type, logged_user){
+
+	var d = new frappe.ui.Dialog({
+			title: __('Reject Reason'),
+			fields: [
+				{
+					"fieldname": "remark",
+					"fieldtype": "Text",
+					"reqd": 1,
+				}
+			],
+			primary_action_label: __('Save'),
+			primary_action: function() {
+				var data = d.get_values();
+				let remark = 'Reject Reason: ' + data.remark;
+	
+				frappe.call({
+					method: "frappe.desk.form.utils.add_comment",
+					args: {
+						reference_doctype: frm.doc.doctype,
+						reference_name: frm.doc.name,
+						content: __(remark),
+						comment_email: frappe.session.user,
+						comment_by: frappe.session.user_fullname
+					},
+					callback: function(r) {
+						if(!r.exc) {
+							reject_status_outside_position(frm, action_type, logged_user);
+							frappe.show_alert("Remark added successfully");
+							d.hide();
+							cur_frm.reload_doc();
+						}
+					}
+				});
+			}
+		});
+	d.show();
+}
+
+function reject_status_outside_position(frm,action_type,logged_user){
+	frappe.call({
+		method: "admin_iiti.admin_iiti.doctype.outside_position.outside_position.update_reject_status",
+		async: true,
+		args: {
+			doctype :frm.doc.doctype,
+			document_name: frm.doc.name,
+			status: action_type,
+			user: logged_user,
+		},
+		callback: function (r) {
+			let data = r.message;
+			if(data){
+				cur_frm.set_value('status',data);
+				frm.reload_doc();
+				frm.refresh();
 			}
 			
 		

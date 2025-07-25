@@ -21,11 +21,13 @@
   "date_of_joining",
   "current_designation",
   "date_of_joining__present_post",
+  "annual_immovable_property",
   "user_id",
   "column_break_8",
   "mode_of_recruitment",
   "position_applying_for",
   "location_of_the_position",
+  "remarks",
   "column_break_12",
   "position_pay_lavel",
   "position_basic_pay",
@@ -49,6 +51,7 @@
   "status",
   "approver_details",
   "follow_via_email",
+  "year",
   "amended_from"
  ],
  "fields": [
@@ -81,7 +84,7 @@
   {
    "fieldname": "designation",
    "fieldtype": "Link",
-   "label": "Designation at the time of joining",
+   "label": "Designation at the Time of Joining",
    "options": "Designation",
    "reqd": 1
   },
@@ -108,7 +111,7 @@
   {
    "fieldname": "location_of_the_position",
    "fieldtype": "Data",
-   "label": "Applying For (Organization/Institude)",
+   "label": "Applying For (Organization/Institute)",
    "reqd": 1
   },
   {
@@ -182,7 +185,7 @@
    "fieldname": "user_id",
    "fieldtype": "Data",
    "hidden": 1,
-   "label": "Employe Email"
+   "label": "Employee Email"
   },
   {
    "fieldname": "pnt_number",
@@ -192,7 +195,7 @@
    "reqd": 1
   },
   {
-   "description": "<div style=\"border: 1px solid #ddd; padding: 10px; background: #f9f9f9; border-radius: 5px; text-align: left; font-size: 14px; text-transform: none;\">\n    <p style=\"color: black; margin: 0; text-align: center;\">Please read the following declaration and confirm.</p>\n    <ul style=\"padding-left: 20px; margin: 5px 0;\">\n        <li>I hereby declare that all the information provided above is accurate to the best of my knowledge. Providing false or misleading information may result in disciplinary actions.</li>\n        <li>I acknowledge that I have read and understood IIT Indore's policies regarding applications for outside positions.</li>\n    </ul>\n</div>",
+   "description": "<div style=\"border: 1px solid #ddd; padding: 10px; background: #f9f9f9; border-radius: 5px; text-align: left; font-size: 14px; text-transform: none;\">\n    <p style=\"color: black; margin: 0; text-align: center;\">Please read the following declaration and confirm.</p>\n    <ul style=\"padding-left: 20px; margin: 5px 0;\">\n        <li>I hereby declare that all the information provided above is accurate to the best of my knowledge.</li>\n        <li>I acknowledge that I have read and understood IIT Indore's policies regarding applications for outside positions.</li>\n    </ul>\n</div>",
    "fieldname": "applicants_declaration_section",
    "fieldtype": "Section Break",
    "label": "Applicant's Declaration"
@@ -211,7 +214,7 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "status",
-   "options": "Draft\nOpen\nForwarded By CVO\nForwarded By Reporting Officer\nForwarded By Officer\nForwarded By Admin\nForwarded By RO\nApproved\nNot Approved\nPending\nProcessed\nChecked\nRecommended\nSanction\nCancelled\nRejected"
+   "options": "Draft\nOpen\nForwarded By CVO\nForwarded By Reporting Officer\nForwarded By Officer\nForwarded By Admin\nForwarded By RO\nForwarded By DOA\nApproved\nNot Approved\nPending\nProcessed\nChecked\nRecommended\nSanction\nCancelled\nRejected"
   },
   {
    "default": "1",
@@ -265,7 +268,7 @@
   {
    "fieldname": "mode_of_recruitment",
    "fieldtype": "Select",
-   "label": "Mode of recruitment",
+   "label": "Mode of Recruitment",
    "options": "\nDirect Recruitment\nDeputation\nShort Term Contract"
   },
   {
@@ -301,12 +304,33 @@
    "label": "Reporting Officer",
    "options": "Leave Recommender",
    "reqd": 1
+  },
+  {
+   "fieldname": "year",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Year",
+   "read_only": 1
+  },
+  {
+   "fieldname": "annual_immovable_property",
+   "fieldtype": "Select",
+   "label": "Annual Immovable Property Return(AIPR) For The Year 2024-25",
+   "options": "\nSubmitted\nNot Submitted\nNot Applicable",
+   "reqd": 1
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Text",
+   "label": "Remarks",
+   "max_height": "50px"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-07-08 16:55:49.019010",
+ "make_attachments_public": 1,
+ "modified": "2025-07-25 13:03:21.579893",
  "modified_by": "Administrator",
  "module": "Admin IITI",
  "name": "Outside Position",
