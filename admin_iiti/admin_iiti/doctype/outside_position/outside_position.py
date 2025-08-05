@@ -55,9 +55,8 @@ class OutsidePosition(Document):
         
     def on_submit(self):
         if self.status == 'Approved':
-            self.share_doc_user(self.user_id)
+            #self.share_doc_user(self.user_id)
             self.update_employee_profile()
-            
             
     def administrative_approver_share(self):
         approval_data = frappe.get_doc("Note Sheet Approval Process",self.doctype,as_dict = 1)
@@ -295,8 +294,7 @@ def update_outside_position_status(doctype, document_name, status, user):
             doc.submit()
         
         return status
-
-
+    
 @frappe.whitelist()
 def update_reject_status(doctype, document_name, status, user):
     if status == 'Rejected':
@@ -345,3 +343,16 @@ def update_reject_status(doctype, document_name, status, user):
         doc.save()
         
         return status
+    
+@frappe.whitelist()
+def cancel_noc_document(docname, doctype, reason):
+	doc = frappe.get_doc(doctype, docname)
+
+	# Allow cancellation even if not submitted
+	if hasattr(doc, "status"):
+		doc.status = "Cancelled"
+
+	# Save changes
+	doc.save(ignore_permissions=True)
+	frappe.db.commit()
+	return {"status": "cancelled"}

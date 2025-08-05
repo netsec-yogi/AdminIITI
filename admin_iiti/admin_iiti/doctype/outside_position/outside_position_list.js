@@ -1,7 +1,6 @@
 frappe.listview_settings['Outside Position'] = {
 	has_indicator_for_draft: 1,
 	onload: function(listview) {
-
         if(frappe.session.user != 'Administrator'){
             frappe.set_route('List', 'Outside Position','List');
             frappe.route_options = {
