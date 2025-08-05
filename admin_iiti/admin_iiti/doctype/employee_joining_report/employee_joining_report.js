@@ -118,6 +118,8 @@ frappe.ui.form.on('Employee Joining Report', {
 				callback: function(r){
 					let data = r.message;
 					frm.set_value("approver",data.leave_approver);
+					frm.set_value("from_date",data.from_date);
+					frm.set_value("to_date",data.to_date);
 				} 
 			});
 		}

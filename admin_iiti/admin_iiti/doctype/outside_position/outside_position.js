@@ -20,8 +20,8 @@ frappe.ui.form.on('Outside Position', {
 		}
 		frappe.require("/assets/admin_iiti/css/outsidePosition.css");
 		if (frm.doc.terms_and_conditions && !frappe.user.has_role("HR Admin")) {
-			//frm.disable_form();
-			frm.disable_save();
+			frm.disable_form();
+			//frm.disable_save();
 			frm.set_df_property('terms_and_conditions', 'read_only', 1);
 		}
 
@@ -92,8 +92,8 @@ frappe.ui.form.on('Outside Position', {
 			frm.set_value('year', new Date().getFullYear());
 		}
 		if (frm.doc.terms_and_conditions && !frappe.user.has_role("HR Admin")) {
-			//frm.disable_form();
-			frm.disable_save();
+			frm.disable_form();
+			//frm.disable_save();
 			frm.set_df_property('terms_and_conditions', 'read_only', 1);
 
 		}
