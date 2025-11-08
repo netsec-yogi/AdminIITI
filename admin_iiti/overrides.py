@@ -244,12 +244,12 @@ class CustomLeaveApplication(Document):
 			from `tabLeave Application`
 			where employee = %(employee)s and docstatus < 2 and status in ('Open', 'Approved')
 			and to_date >= %(from_date)s and from_date <= %(to_date)s
-			and name != %(name)s""",
+			and name != %(name)s and leave_type = %(leave_type)s""",
 			{
 				"employee": self.employee,
 				"from_date": self.from_date,
 				"to_date": self.to_date,
-				"name": self.name,
+				"name": self.name,"leave_type": self.leave_type,
 			},
 			as_dict=1,
 		):
