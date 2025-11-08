@@ -48,6 +48,7 @@ class CustomLeaveApplication(Document):
         validate_active_employee(self.employee)
         set_employee_name(self)
         self.validate_dates()
+        self.validate_leave_balance_pending()
         self.validate_leave_balance()
         self.validate_leave_overlap()
         self.validate_max_days()
@@ -286,6 +287,49 @@ class CustomLeaveApplication(Document):
             
         if self.half_day == 0:
             self.half_day_date = None
+            
+    def validate_leave_balance_pending(self):
+        if self.leave_type_name == 'Other Leave':
+            return
+        
+        if not self.leave_balance:
+            frappe.throw(_("Leave balance is not set for Leave Type {0} in this allocation.").format(
+                frappe.bold(self.leave_type)
+            ))
+            
+        leave_balance = self.leave_balance
+        
+        # Base SQL query
+        sql_query = """
+            SELECT SUM(total_leave_days)
+            FROM `tabLeave Application`
+            WHERE employee = %(employee)s
+            AND docstatus < 2
+            AND status IN ('Open', 'Recommended')
+            AND leave_type = %(leave_type)s
+        """
+        filters = {
+            "employee": self.employee,
+            "leave_type": self.leave_type,
+        }
+        # Add year filter only for RH or CL
+        if self.leave_type in ("Casual Leave", "Restricted Holiday Leave"):
+            current_year = getdate(nowdate()).year
+            sql_query += " AND YEAR(from_date) = %(current_year)s"
+            filters["current_year"] = current_year
+            
+        employee_pending_leave = frappe.db.sql(sql_query, filters)[0][0] or 0
+        
+        
+        # Calculate total (current + pending)
+        all_total_pending_leave = employee_pending_leave + self.total_leave_days
+        
+        # Validation: pending or insufficient balance
+        if float(leave_balance) < float(all_total_pending_leave):
+            msg = _("Warning: Insufficient leave balance for Leave Type {0}. You have already applied for leave, which is still pending, so you cannot apply for another leave. if you want to apply for kindly cancelled the old pending leave").format(
+                frappe.bold(self.leave_type)
+            )
+            frappe.throw(msg)
     
     def validate_leave_balance(self):
         #int(self.leave_balance)
