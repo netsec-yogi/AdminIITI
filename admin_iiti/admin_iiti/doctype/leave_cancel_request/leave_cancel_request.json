@@ -1,5 +1,6 @@
 {
  "actions": [],
+ "allow_import": 1,
  "allow_rename": 1,
  "autoname": "field:leave_application",
  "creation": "2023-02-04 11:40:41.051513",
@@ -8,6 +9,7 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "section_break_1",
   "employee",
   "employee_name",
   "column_break_3",
@@ -15,14 +17,19 @@
   "designation",
   "leave_details_section",
   "leave_application",
+  "leave_cancel_type",
   "from_date",
   "to_date",
-  "total_leave_days",
   "column_break_11",
   "leave_type",
+  "leave_type_name",
   "approver",
+  "total_leave_days",
   "status",
+  "reason",
   "follow_via_email",
+  "doc_approved_date",
+  "year",
   "amended_from"
  ],
  "fields": [
@@ -31,7 +38,8 @@
    "fieldtype": "Link",
    "in_standard_filter": 1,
    "label": "Employee",
-   "options": "Employee"
+   "options": "Employee",
+   "reqd": 1
   },
   {
    "fetch_from": "employee.employee_name",
@@ -49,13 +57,15 @@
    "fetch_from": "employee.department",
    "fieldname": "department",
    "fieldtype": "Data",
-   "label": "Department"
+   "label": "Department",
+   "read_only": 1
   },
   {
    "fetch_from": "employee.designation",
    "fieldname": "designation",
    "fieldtype": "Data",
-   "label": "Designation"
+   "label": "Designation",
+   "read_only": 1
   },
   {
    "fieldname": "leave_details_section",
@@ -69,23 +79,29 @@
    "in_standard_filter": 1,
    "label": "Leave Application",
    "options": "Leave Application",
+   "reqd": 1,
    "unique": 1
   },
   {
    "fieldname": "from_date",
    "fieldtype": "Date",
-   "label": "From Date"
+   "hidden": 1,
+   "label": "From Date",
+   "mandatory_depends_on": "eval:doc.leave_cancel_type"
   },
   {
    "fieldname": "to_date",
    "fieldtype": "Date",
-   "label": "To date"
+   "hidden": 1,
+   "label": "To date",
+   "mandatory_depends_on": "eval:doc.leave_cancel_type"
   },
   {
    "fieldname": "total_leave_days",
    "fieldtype": "Data",
    "label": "Total Leave Days",
-   "read_only": 1
+   "read_only": 1,
+   "reqd": 1
   },
   {
    "fieldname": "column_break_11",
@@ -96,20 +112,22 @@
    "fieldname": "leave_type",
    "fieldtype": "Data",
    "label": "Leave Type",
-   "read_only": 1
+   "read_only": 1,
+   "reqd": 1
   },
   {
    "fetch_from": "leave_application.leave_approver",
    "fieldname": "approver",
    "fieldtype": "Data",
    "label": "Approver",
-   "read_only": 1
+   "read_only": 1,
+   "reqd": 1
   },
   {
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "Open\nApproved\nNot Approved"
+   "options": "Open\nApproved\nRejected\nNot Approved"
   },
   {
    "default": "1",
@@ -128,19 +146,49 @@
    "read_only": 1
   },
   {
-   "fieldname": "amended_from",
-   "fieldtype": "Link",
-   "label": "Amended From",
-   "no_copy": 1,
-   "options": "Leave cancel Request",
-   "print_hide": 1,
+   "fieldname": "leave_cancel_type",
+   "fieldtype": "Select",
+   "label": "Leave Cancel Type",
+   "options": "\nCancelled\nAmended",
+   "reqd": 1
+  },
+  {
+   "fieldname": "doc_approved_date",
+   "fieldtype": "Datetime",
+   "hidden": 1,
+   "label": "doc_approved_date",
    "read_only": 1
+  },
+  {
+   "description": "<b><h5 style=\"color: red;\">Note:</h5><h5> If you want to cancel the full applied leave then select the Leave cancel type is cancelled. While partial cancellation of leave you may select Amended and select the duration of cancellation of the leave.</h5></b>",
+   "fieldname": "section_break_1",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "year",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "in_standard_filter": 1,
+   "label": "Year",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "leave_application.other_leave_type",
+   "fieldname": "leave_type_name",
+   "fieldtype": "Data",
+   "label": "Other Leave Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "reason",
+   "fieldtype": "Small Text",
+   "label": "Reason For Cancellation"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-04-18 12:54:34.636916",
+ "modified": "2025-05-14 12:59:48.271671",
  "modified_by": "Administrator",
  "module": "Admin IITI",
  "name": "Leave cancel Request",

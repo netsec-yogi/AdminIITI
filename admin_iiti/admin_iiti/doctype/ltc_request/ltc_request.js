@@ -62,6 +62,13 @@ frappe.ui.form.on('LTC Request', {
 					frm.disable_save();
 				}
 			}
+			if(frm.doc.status == 'Open'){
+				frm.trigger('document_cancel');
+			}
+
+			if(frappe.session.user == 'hrmanager@iiti.ac.in' && frm.doc.status != 'Approve'){
+				frm.trigger('document_cancel');
+			}
 		}
 		cur_frm.set_intro("");
 		if (frm.doc.__islocal && !in_list(frappe.user_roles, "Employee")) {
@@ -110,6 +117,13 @@ frappe.ui.form.on('LTC Request', {
 				if(frappe.session.user != 'hrmanager@iiti.ac.in'){
 					frm.disable_save();
 				}
+			}
+			if(frm.doc.status == 'Open'){
+				frm.trigger('document_cancel');
+			}
+
+			if(frappe.session.user == 'hrmanager@iiti.ac.in' && frm.doc.status != 'Approve'){
+				frm.trigger('document_cancel');
 			}
 
 			
@@ -165,12 +179,12 @@ frappe.ui.form.on('LTC Request', {
 				filters: [
 					["leave_application", "=", frm.doc.leave_application]
 				],
-				fieldname: "name"
+				fieldname: ["name","docstatus"]
 			},
 			"callback": function (response) {
 				var data = response.message;
-
-				if (data.name) {
+				console.log('data',data);
+				if (data.name && data.docstatus != 2) {
 
 					frappe.msgprint(__("You already Applied LTC Request for this Leave Application"));
 					frm.set_value("leave_application", "")
@@ -198,7 +212,7 @@ frappe.ui.form.on('LTC Request', {
 
 				if (one_year_date > current_date) {
 
-					frappe.msgprint(__("After One Year Services Than you Can Applied LTC."));
+					frappe.msgprint(__("After One Year Services than you can applied LTC."));
 					frm.set_value("employee", "")
 
 				}
@@ -348,7 +362,16 @@ frappe.ui.form.on('LTC Request', {
 				}
 			} 
 		});
-	}
+	},
+	document_cancel:function(frm){
+		frm.add_custom_button(__('Cancel'), function () {
+			let action_type = 'Cancelled';
+			let user_details = frappe.session.user;
+			
+			doc_cancel_with_reasone(frm,action_type,user_details);
+
+		}).addClass("btn-primary").css({ 'color': '#ffffff', 'font-weight': 'bold', 'background-color': '#2a07ff99' });
+	},
 	
 });
 function reject_with_resone(frm){
@@ -591,4 +614,65 @@ function change_status_LTC(frm,action_type,user){
 		
 		}
 	});
+}
+function doc_cancel_with_reasone(frm,action_type,user){
+	var d = new frappe.ui.Dialog({
+		title: __('Reason for Cancel'),
+		fields: [
+			{
+				"fieldname": "reason_for_cancel",
+				"fieldtype": "Text",
+				"reqd": 1,
+			}
+		],
+		primary_action: function() {
+			var data = d.get_values();
+			let reason_for_cancel = 'Reason for Cancel: ' + data.reason_for_cancel;
+
+			frappe.call({
+				method: "frappe.desk.form.utils.add_comment",
+				args: {
+					reference_doctype: frm.doc.doctype,
+					reference_name: frm.doc.name,
+					content: __(reason_for_cancel),
+					comment_email: user,
+					comment_by: frappe.session.user_fullname
+				},
+				callback: function(r) {
+					if(!r.exc) {
+						doc_cancel(frm,action_type,user,reason_for_cancel);
+						d.hide();
+						cur_frm.reload_doc();
+					}
+				}
+			});
+		}
+	});
+	d.show();
+}
+function doc_cancel(frm,action_type,user,reason_for_cancel){
+	if(user){
+		frappe.call({
+			"method": 'admin_iiti.admin_iiti.doctype.ltc_request.ltc_request.cancel_doc',
+			"args": {
+				"contant": reason_for_cancel,
+				"email_id":user,
+				"doctype":frm.doc.doctype,
+				"docname":frm.doc.name,
+				"action":action_type
+			},
+			"async": false,
+			callback: function (r) {
+				let data = r.message;
+				console.log(data);
+				if (data == 'update') {
+					frappe.msgprint("Document Successfully Cancelled");
+					cur_frm.refresh();
+				}else{
+					frappe.msgprint("Invaild Request");
+					cur_frm.refresh();
+				}
+			}
+		});
+	}
 }

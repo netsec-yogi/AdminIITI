@@ -1,0 +1,396 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2025-02-18 15:13:03.603843",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "personal_information_section",
+  "naming_series",
+  "employee",
+  "employee_name",
+  "pnt_number",
+  "pay_level",
+  "basic_pay",
+  "column_break_5",
+  "designation",
+  "department",
+  "date_of_joining",
+  "current_designation",
+  "date_of_joining__present_post",
+  "annual_immovable_property",
+  "user_id",
+  "column_break_8",
+  "mode_of_recruitment",
+  "position_applying_for",
+  "location_of_the_position",
+  "remark",
+  "column_break_12",
+  "position_pay_lavel",
+  "position_basic_pay",
+  "application_submission_date",
+  "required_supporting_documents_section",
+  "application_form",
+  "column_break_17",
+  "office_memorandum",
+  "section_break_20",
+  "outside_position_previous_applications",
+  "reporting_officer_information_section",
+  "reporting_officer",
+  "reviewing_officer_section",
+  "reviewing_officer_name",
+  "reviewing_officer_designation",
+  "column_break_25",
+  "reviewing_officer_department",
+  "reviewing_officer_contact",
+  "applicants_declaration_section",
+  "terms_and_conditions",
+  "status",
+  "approver_details",
+  "follow_via_email",
+  "year",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "description": "\n        Personal Information\n",
+   "fieldname": "personal_information_section",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Naming Series",
+   "options": "IIT-Admin-OPR-.YYYY.-"
+  },
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "in_standard_filter": 1,
+   "label": "Employee",
+   "options": "Employee",
+   "reqd": 1
+  },
+  {
+   "fieldname": "employee_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Employee Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "designation",
+   "fieldtype": "Link",
+   "label": "Designation at the time of joining",
+   "options": "Designation",
+   "reqd": 1
+  },
+  {
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "label": "Department",
+   "options": "Department",
+   "reqd": 1
+  },
+  {
+   "fieldname": "date_of_joining",
+   "fieldtype": "Data",
+   "label": "Date of Joining (Initial at IIT)",
+   "reqd": 1
+  },
+  {
+   "fieldname": "position_applying_for",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Position Applying For",
+   "reqd": 1
+  },
+  {
+   "fieldname": "location_of_the_position",
+   "fieldtype": "Data",
+   "label": "Applying For (Organization/Institute)",
+   "reqd": 1
+  },
+  {
+   "fieldname": "application_submission_date",
+   "fieldtype": "Date",
+   "label": "Last Date Of Application/NOC Submission",
+   "reqd": 1
+  },
+  {
+   "description": "\n    Required Supporting Documents\n<span class=\"h6 text-danger\">(Please upload the necessary documents for your request)</span>\n\n",
+   "fieldname": "required_supporting_documents_section",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "application_form",
+   "fieldtype": "Attach",
+   "label": "Application Form"
+  },
+  {
+   "fieldname": "office_memorandum",
+   "fieldtype": "Attach",
+   "label": "Advertisment Form"
+  },
+  {
+   "description": "\n    Position Details\n",
+   "fieldname": "column_break_8",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_12",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_17",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Outside Position",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "outside_position_previous_applications",
+   "fieldtype": "Table",
+   "options": "Outside Position Previous Applications"
+  },
+  {
+   "description": "\nDetails Of Previous Applications For Outside Positions\n\n",
+   "fieldname": "section_break_20",
+   "fieldtype": "Section Break"
+  },
+  {
+   "description": "Reporting Officer Information",
+   "fieldname": "reporting_officer_information_section",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_25",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "user_id",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Employee Email"
+  },
+  {
+   "fieldname": "pnt_number",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "PNT No.",
+   "reqd": 1
+  },
+  {
+   "description": "<div style=\"border: 1px solid #ddd; padding: 10px; background: #f9f9f9; border-radius: 5px; text-align: left; font-size: 14px; text-transform: none;\">\n    <p style=\"color: black; margin: 0; text-align: center;\">Please read the following declaration and confirm.</p>\n    <ul style=\"padding-left: 20px; margin: 5px 0;\">\n        <li>I hereby declare that all the information provided above is accurate to the best of my knowledge.</li>\n        <li>I acknowledge that I have read and understood IIT Indore's policies regarding applications for outside positions.</li>\n    </ul>\n</div>",
+   "fieldname": "applicants_declaration_section",
+   "fieldtype": "Section Break",
+   "label": "Applicant's Declaration"
+  },
+  {
+   "default": "0",
+   "fieldname": "terms_and_conditions",
+   "fieldtype": "Check",
+   "label": "<b>I Agree to the Terms and Conditions</b>"
+  },
+  {
+   "default": "Draft",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "status",
+   "options": "Draft\nOpen\nForwarded By CVO\nForwarded By Reporting Officer\nForwarded By Officer\nForwarded By Admin\nForwarded By RO\nForwarded By DOA\nApproved\nNot Approved\nPending\nProcessed\nChecked\nRecommended\nSanction\nCancelled\nRejected"
+  },
+  {
+   "default": "1",
+   "fieldname": "follow_via_email",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "follow_via_email"
+  },
+  {
+   "fieldname": "approver_details",
+   "fieldtype": "Text",
+   "hidden": 1,
+   "label": "Approver details"
+  },
+  {
+   "fieldname": "position_pay_lavel",
+   "fieldtype": "Link",
+   "label": "Position Pay Level",
+   "options": "Pay Level",
+   "reqd": 1
+  },
+  {
+   "fieldname": "position_basic_pay",
+   "fieldtype": "Data",
+   "label": "Position Basic Pay",
+   "reqd": 1
+  },
+  {
+   "fieldname": "pay_level",
+   "fieldtype": "Link",
+   "label": "Pay Level",
+   "options": "Pay Level",
+   "reqd": 1
+  },
+  {
+   "fieldname": "basic_pay",
+   "fieldtype": "Data",
+   "label": "Current Basic Pay",
+   "reqd": 1
+  },
+  {
+   "fieldname": "current_designation",
+   "fieldtype": "Link",
+   "label": "Current Designation",
+   "options": "Designation",
+   "reqd": 1
+  },
+  {
+   "fieldname": "date_of_joining__present_post",
+   "fieldtype": "Date",
+   "label": "Date of Joining (Present Post)",
+   "reqd": 1
+  },
+  {
+   "fieldname": "mode_of_recruitment",
+   "fieldtype": "Select",
+   "label": "Mode of Recruitment",
+   "options": "\nDirect Recruitment\nDeputation\nShort Term Contract"
+  },
+  {
+   "fieldname": "reviewing_officer_section",
+   "fieldtype": "Section Break",
+   "label": "Reviewing officer"
+  },
+  {
+   "fieldname": "reviewing_officer_name",
+   "fieldtype": "Link",
+   "label": "Reviewing Officer Email",
+   "options": "User",
+   "reqd": 1
+  },
+  {
+   "fieldname": "reviewing_officer_designation",
+   "fieldtype": "Data",
+   "label": "Designation"
+  },
+  {
+   "fieldname": "reviewing_officer_department",
+   "fieldtype": "Data",
+   "label": "Department/Office/Section"
+  },
+  {
+   "fieldname": "reviewing_officer_contact",
+   "fieldtype": "Data",
+   "label": "Contact Details of Reporting Officer"
+  },
+  {
+   "fieldname": "reporting_officer",
+   "fieldtype": "Table",
+   "label": "Reporting Officer",
+   "options": "Leave Recommender",
+   "reqd": 1
+  },
+  {
+   "fieldname": "year",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Year",
+   "read_only": 1
+  },
+  {
+   "fieldname": "annual_immovable_property",
+   "fieldtype": "Select",
+   "label": "Annual Immovable Property Return(AIPR) For The Year 2024-25",
+   "options": "\nSubmitted\nNot Submitted\nNot Applicable",
+   "reqd": 1
+  },
+  {
+   "fieldname": "remark",
+   "fieldtype": "Text",
+   "label": "Remark",
+   "max_height": "50px"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "make_attachments_public": 1,
+ "modified": "2025-07-25 13:02:33.972582",
+ "modified_by": "Administrator",
+ "module": "Admin IITI",
+ "name": "Outside Position",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [
+  {
+   "color": "Red",
+   "title": "Draft"
+  },
+  {
+   "color": "Orange",
+   "title": "Open"
+  },
+  {
+   "color": "Pink",
+   "title": "Forwarded By Officer"
+  },
+  {
+   "color": "Cyan",
+   "title": "Forwarded By Admin"
+  },
+  {
+   "color": "Blue",
+   "title": "Forwarded By RO"
+  },
+  {
+   "color": "Purple",
+   "title": "Processed"
+  },
+  {
+   "color": "Blue",
+   "title": "Checked"
+  },
+  {
+   "color": "Yellow",
+   "title": "Recommended"
+  },
+  {
+   "color": "Green",
+   "title": "Approved"
+  }
+ ],
+ "track_changes": 1
+}

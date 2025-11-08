@@ -28,7 +28,8 @@
   "entitlement",
   "encashment_of_el",
   "column_break_19",
-  "advance_requested"
+  "advance_requested",
+  "follow_via_email"
  ],
  "fields": [
   {
@@ -153,12 +154,18 @@
    "fieldname": "advance_requested",
    "fieldtype": "Float",
    "label": "Advance Requested "
+  },
+  {
+   "default": "1",
+   "fieldname": "follow_via_email",
+   "fieldtype": "Check",
+   "label": "Follow Via Email"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
  "make_attachments_public": 1,
- "modified": "2024-04-17 11:15:44.056069",
+ "modified": "2025-01-09 11:50:42.719406",
  "modified_by": "Administrator",
  "module": "Admin IITI",
  "name": "LTC Office Memorandum",

@@ -9,11 +9,15 @@ from datetime import date
 from frappe.utils import (
     cint,
     get_fullname,
-    get_fullname
+    get_fullname,
+    date_diff,
+    flt,
+    add_days,
 )
 
-
 class LeavecancelRequest(Document):
+    def validate(self):
+        self.validate_amended_leave()
     def on_update(self):
         if self.status == 'Open' and self.docstatus < 1:
             approver = self.approver
@@ -24,26 +28,44 @@ class LeavecancelRequest(Document):
     def on_submit(self):
         if self.status == "Open":
             frappe.throw(
-                _("Only 'Approved' and 'Not approved' and Cancel can be submitted"))
+                _("Only 'Approved' and 'Rejected' and Cancel can be submitted"))
 
         if self.status == "Approved":
             self.update_Ledger_entry()
             self.update_Leave_status()
 
-        if self.status == "Approved" or self.status == 'Not Approved':
+        if self.status == "Approved" or self.status == 'Rejected':
             self.notify_employee()
 
         self.reload()
 
     def update_Ledger_entry(self):
         if self.leave_application:
-            frappe.db.set_value('Leave Ledger Entry',
-                                {'transaction_type': 'Leave Application', 'transaction_name': self.leave_application},
-                                {'leaves': self.total_leave_days},
-                                update_modified=False)
+            if self.leave_cancel_type == 'Cancelled':
+                frappe.db.set_value('Leave Ledger Entry',{'transaction_type': 'Leave Application', 'transaction_name': self.leave_application},{'leaves': self.total_leave_days},update_modified=False)
+            else:
+                leave_application_data = frappe.get_value("Leave Application", {"name": self.leave_application},["*"],as_dict=1)
+                
+                total_amended_leaves = float(leave_application_data.total_leave_days)-float(self.total_leave_days)
+                
+                if self.leave_type == 'Half Paid Leave':
+                    total_amended_leave = total_amended_leaves * 2
+                else:
+                    total_amended_leave = total_amended_leaves
+                
+                if total_amended_leave:
+                    number_of_day = total_amended_leave - 1
+                    if number_of_day == 0:
+                        new_to_date = leave_application_data.from_date
+                    else:
+                        new_to_date = add_days(leave_application_data.from_date,number_of_day)
+                    frappe.db.set_value('Leave Ledger Entry',{'transaction_type': 'Leave Application', 'transaction_name': self.leave_application},{'to_date':new_to_date,'leaves': -total_amended_leave},update_modified=False)
+                    
+                    #P: leave application update
+                    frappe.db.set_value("Leave Application", {"name": self.leave_application},{"to_date":new_to_date,"status":"Amended","total_leave_days":total_amended_leave},update_modified=False)
 
     def update_Leave_status(self):
-        if self.leave_application:
+        if self.leave_application and self.leave_cancel_type == 'Cancelled':
             frappe.db.set_value('Leave Application',{'name':self.leave_application},{'status':'Cancelled'},update_modified=False)
 
     def share_doc_with_approver(doc, user):
@@ -69,7 +91,7 @@ class LeavecancelRequest(Document):
             frappe.msgprint(_("Please set default template for Leave Status Notification in HR Settings."))
             return
         email_template = frappe.get_doc("Email Template", template)
-        message = frappe.render_template(email_template.response, args)
+        message = frappe.render_template(email_template.response_html, args)
 
         notify(self, {
             # for post in messages
@@ -90,7 +112,7 @@ class LeavecancelRequest(Document):
                 frappe.msgprint(_("Please set default template for Leave Approval Notification in HR Settings."))
                 return
             email_template = frappe.get_doc("Email Template", template)
-            message = frappe.render_template(email_template.response, args)
+            message = frappe.render_template(email_template.response_html, args)
             notify(self, {
                 # for post in messages
                 "message": message,
@@ -98,6 +120,11 @@ class LeavecancelRequest(Document):
                 # for email
                 "subject": email_template.subject
             })
+    
+    def validate_amended_leave(self):
+        leave_application_data = frappe.get_value("Leave Application", {"name": self.leave_application},["*"],as_dict=1)
+        if self.leave_cancel_type == 'Amended' and leave_application_data.total_leave_days <= 1:
+            frappe.throw("invalid leave cancel type select")
 
 
 def notify(self, args):
@@ -123,3 +150,15 @@ def notify(self, args):
             frappe.msgprint(_("Email sent to {0}").format(contact))
         except frappe.OutgoingEmailError:
             pass
+
+@frappe.whitelist()        
+def get_leave_application_data(name):
+    data = frappe.db.get_value('Leave Application', {'name':name}, ['*'],as_dict =1)
+    return data
+
+@frappe.whitelist()
+def get_number_of_leave_days(employee: str,leave_type: str,from_date: str,to_date: str,) -> float:
+    number_of_days = 0
+    number_of_days = date_diff(to_date, from_date) + 1
+        
+    return number_of_days

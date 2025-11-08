@@ -8,6 +8,7 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "section_break_1",
   "employee",
   "employee_name",
   "column_break_3",
@@ -15,14 +16,15 @@
   "designation",
   "leave_details_section",
   "leave_application",
+  "leave_type",
   "from_date",
-  "to_date",
-  "status",
   "column_break_10",
   "approver",
   "reporting_date",
-  "amended_from",
-  "follow_via_email"
+  "to_date",
+  "status",
+  "follow_via_email",
+  "amended_from"
  ],
  "fields": [
   {
@@ -49,14 +51,16 @@
    "fieldname": "department",
    "fieldtype": "Link",
    "label": "Department",
-   "options": "Department"
+   "options": "Department",
+   "read_only": 1
   },
   {
    "fetch_from": "employee.designation",
    "fieldname": "designation",
    "fieldtype": "Link",
    "label": "Designation",
-   "options": "Designation"
+   "options": "Designation",
+   "read_only": 1
   },
   {
    "fieldname": "leave_details_section",
@@ -91,19 +95,20 @@
    "fieldtype": "Column Break"
   },
   {
-   "fetch_from": "leave_application.leave_approver",
    "fieldname": "approver",
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Approver",
-   "options": "User"
+   "options": "User",
+   "read_only": 1
   },
   {
    "fieldname": "status",
    "fieldtype": "Select",
+   "hidden": 1,
    "in_standard_filter": 1,
    "label": "Status",
-   "options": "Open\nApproved\nNot Approved"
+   "options": "Open\nApproved\nNot Approved\nRejected"
   },
   {
    "fieldname": "amended_from",
@@ -115,8 +120,11 @@
    "read_only": 1
   },
   {
+   "default": "Today",
    "fieldname": "reporting_date",
    "fieldtype": "Date",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Reporting Date"
   },
   {
@@ -126,12 +134,24 @@
    "hidden": 1,
    "label": "follow via email",
    "print_hide": 1
+  },
+  {
+   "fetch_from": "leave_application.leave_type",
+   "fieldname": "leave_type",
+   "fieldtype": "Data",
+   "label": "Leave Type",
+   "read_only": 1
+  },
+  {
+   "description": "<h5 style=\"color: red;\"><b>Note:-Without leave approval, you cannot fill out the leave joining form. <b></b></b></h5>",
+   "fieldname": "section_break_1",
+   "fieldtype": "Section Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-01-12 16:08:04.317171",
+ "modified": "2025-03-07 11:33:36.931924",
  "modified_by": "Administrator",
  "module": "Admin IITI",
  "name": "Employee Joining Report",

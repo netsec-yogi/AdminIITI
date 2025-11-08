@@ -14,6 +14,8 @@ app_license = "MIT"
 # app_include_css = "/assets/admin_iiti/css/admin_iiti.css"
 # app_include_js = "/assets/admin_iiti/js/admin_iiti.js"
 app_include_js = "/assets/admin_iiti/js/custom_side_menu.js"
+app_include_css = "/assets/admin_iiti/css/custom.css"
+
 
 # include js, css files in header of web template
 # web_include_css = "/assets/admin_iiti/css/admin_iiti.css"
@@ -122,17 +124,23 @@ override_doctype_class = {
 #	}
 # }
 
-doc_events ={
+# doc_events ={
 
-    "Leave Application":{
+#     "Leave Application":{
 
-        "after_insert":"admin_iiti.overrides.after_insert_recommeder"
-	}
-}
+#         "after_insert":"admin_iiti.overrides.after_insert_recommeder"
+# 	}
+# }
 
 # Scheduled Tasks
 # ---------------
 
+scheduler_events= {
+	"daily": [
+  		"admin_iiti.admin_schedular.birthday_reminder_non_teaching",
+        "admin_iiti.admin_schedular.pending_leave_reminder",
+	]
+}
 # scheduler_events = {
 #	"all": [
 #		"admin_iiti.tasks.all"
@@ -205,4 +213,4 @@ doc_events ={
 # auth_hooks = [
 #	"admin_iiti.auth.validate"
 # ]
-update_website_context = "admin_iiti.overrides.update_website_context"
+#update_website_context = "admin_iiti.overrides.update_website_context"

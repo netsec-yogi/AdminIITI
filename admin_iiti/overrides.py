@@ -33,6 +33,9 @@ from hrms.hr.utils import (
 class NotAnOptionalHoliday(frappe.ValidationError):
     pass
 
+class OverlapError(frappe.ValidationError):
+	pass
+
 
 from hrms.hr.doctype.leave_application.leave_application import LeaveApplication
 
@@ -41,16 +44,34 @@ from hrms.hr.doctype.leave_application.leave_application import LeaveApplication
 
 
 class CustomLeaveApplication(Document):
-
-    def on_update(self):
+    def validate(self):
+        validate_active_employee(self.employee)
+        set_employee_name(self)
+        self.validate_dates()
+        self.validate_leave_balance()
+        self.validate_leave_overlap()
+        self.validate_max_days()
+        self.set_half_day_date()
         if frappe.db.get_value("Leave Type", self.leave_type, "is_optional_leave"):
             self.validate_optional_leave()
+    def on_update(self):
+        #frappe.throw(frappe.as_json(self.status))
         if self.status == "Open" and self.docstatus < 1:
-            # self.after_insert_recommeder()
-            count_recommender = self.validate_recommender_entry()
-            self.send_share_leave_notice()
-        # frappe.msgprint("\n \n \n",count_recommender,"\n\n\n")
-
+            if self.leave_recommenders:
+                for r in self.leave_recommenders:
+                    if r.status == 'Open':
+                        self.notify_leave(r.recommender)
+                        self.share_doc_with_recommender(r.recommender)
+            else:
+                # notify leave approver about creation
+                if frappe.db.get_single_value("HR Settings", "send_leave_notification"):
+                    self.notify_leave(self.leave_approver)
+                    share_doc_with_approver(self, self.leave_approver)
+        if self.status == 'Recommended' and self.docstatus < 1:
+            frappe.db.set_value('Leave Application',{'name':self.name},{'status':'Recommended'},update_modified=False)
+            self.notify_leave(self.leave_approver)
+            share_doc_with_approver(self, self.leave_approver)
+                    
     def on_submit(self):
         # frappe.msgprint('custom-submit')
         if self.status == "Open":
@@ -65,44 +86,63 @@ class CustomLeaveApplication(Document):
 
         self.create_leave_ledger_entry()
         self.reload()
-
+        
+    def share_doc_with_recommender(doc, user):
+        # if approver does not have permissions, share
+        if not frappe.has_permission(doc=doc, ptype="write", user=user):
+            frappe.share.add_docshare(doc.doctype, doc.name, user, write=1,flags={"ignore_share_permission": True})
+            frappe.msgprint(_("Shared with the user {0} with {1} access").format(user, frappe.bold("write"), alert=True))
+            
+    def validate_dates(self):
+        if frappe.db.get_single_value("HR Settings", "restrict_backdated_leave_application"):
+            if self.from_date and getdate(self.from_date) < getdate():
+                allowed_role = frappe.db.get_single_value("HR Settings", "role_allowed_to_create_backdated_leave_application")
+                user = frappe.get_doc("User", frappe.session.user)
+                user_roles = [d.role for d in user.roles]
+                if not allowed_role:
+                    frappe.throw(
+						_("Backdated Leave Application is restricted. Please set the {} in {}").format(
+							frappe.bold("Role Allowed to Create Backdated Leave Application"),
+							get_link_to_form("HR Settings", "HR Settings"),
+						)
+					)
+                if allowed_role and allowed_role not in user_roles:
+                    frappe.throw(_("Only users with the {0} role can create backdated leave applications").format(allowed_role))
+                    
+    def notify_leave(self,user):
+        parent_doc = frappe.get_doc("Leave Application", self.name)
+        args = parent_doc.as_dict()
+        
+        template = 'Leave Approval Notification'
+        if not template:
+            frappe.msgprint(_("Please set default template for Leave Approval Notification in HR Settings."))
+            return
+        email_template = frappe.get_doc("Email Template", template)
+        message = frappe.render_template(email_template.response_html, args)
+        
+        notify(self,
+               {
+                   # for post in messages
+                   "message": message,
+                   "message_to": user,
+                   # for email
+                   # "subject": email_template.subject,
+                   "subject": email_template.subject + " " + self.employee_name + " from " + self.from_date + " to " + self.to_date,
+               }
+               )
+      
     def create_leave_ledger_entry(self, submit=True):
-
         if self.status != 'Approved' and submit:
             return
-
-        # p:leave ledger entry update for paternity leave
-
-        if self.from_date:
-            current_date = self.from_date
-        else:
-            current_date = self.posting_date
-
-        if self.leave_type_name == 'Paternity Leave':
-            allocated_data = frappe.db.get_value("Leave Allocation",
-                                                 {"employee": self.employee, "leave_type_name": self.leave_type_name,
-                                                  'from_date': ('<=', self.posting_date),
-                                                  'to_date': ('>=', self.posting_date)}, "name", as_dict=1)
-
-            frappe.db.set_value("Leave Ledger Entry",
-                                {'employee': self.employee, 'transaction_type': 'Leave Allocation',
-                                 'transaction_name': allocated_data.name}, {'is_expired': 1}, update_modified=False)
-
-        # p:End ledger entry update for paternity leave
-
-        # expiry_date = get_allocation_expiry(self.employee, self.leave_type,
-        # self.to_date, self.from_date)
-
-        expiry = frappe.get_all("Leave Ledger Entry",
-                                filters={
-                                    'employee': self.employee,
-                                    'leave_type': self.leave_type,
-                                    'is_carry_forward': 1,
-                                    'transaction_type': 'Leave Allocation',
-                                    'to_date': ['between', (self.from_date, self.to_date)]
-                                }, fields=['to_date'])
+        expiry = frappe.get_all("Leave Ledger Entry",filters={
+            'employee': self.employee,
+            'leave_type': self.leave_type,
+            'is_carry_forward': 1,
+            'transaction_type': 'Leave Allocation',
+            'to_date': ['between', (self.from_date, self.to_date)]}, fields=['to_date'])
+        
         expiry_date = expiry[0]['to_date'] if expiry else None
-
+        
         lwp = frappe.db.get_value("Leave Type", self.leave_type, "is_lwp")
 
         if expiry_date:
@@ -119,30 +159,58 @@ class CustomLeaveApplication(Document):
                 is_lwp=lwp,
                 holiday_list=get_holiday_list_for_employee(self.employee, raise_exception=raise_exception) or ''
             )
-            if self.leave_type_name == 'Commuted Leave':
-                HPL_balance_minus(self)
-            elif self.leave_type_name == 'Half Paid Leave':
-                HPL_balance_minus(self)
+            if self.leave_type_name == 'Commuted Leave' or self.leave_type_name == 'Half Paid Leave' :
+                self.HPL_balance_minus()
             else:
                 create_leave_ledger_entry(self, args, submit)
-
-    def validate_recommender_entry(self):
-        if self.leave_recommender and not self.leave_recommender_second and not self.leave_recommender_third:
-            flag = 1
-            return 1
-        elif self.leave_recommender and self.leave_recommender_second and not self.leave_recommender_third:
-            flag = 2
-            return 2
-        elif self.leave_recommender and self.leave_recommender_second and self.leave_recommender_third:
-            flag = 3
-            return 3
-        elif not self.leave_recommender and not self.leave_recommender_second and not self.leave_recommender_third:
-            flag = 4
-            return 4
-        else:
-            frappe.throw("ALERT:Recommendation authority is not set properly!!")
-            return 0
-
+                
+    def create_ledger_entry_for_intermediate_allocation_expiry(self, expiry_date, submit, lwp):
+        """Splits leave application into two ledger entries to consider expiry of allocation"""
+        raise_exception = False if frappe.flags.in_patch else True
+        
+        leaves = get_number_of_leave_days(
+            self.employee, self.leave_type, self.from_date, expiry_date, self.half_day, self.half_day_date
+        )
+        if leaves:
+            args = dict(
+                from_date=self.from_date,
+                to_date=expiry_date,
+                leaves=leaves * -1,
+                is_lwp=lwp,
+                holiday_list=get_holiday_list_for_employee(self.employee, raise_exception=raise_exception)
+                or "",
+            )
+            create_leave_ledger_entry(self, args, submit)
+            
+        if getdate(expiry_date) != getdate(self.to_date):
+            start_date = add_days(expiry_date, 1)
+            leaves = get_number_of_leave_days(
+                self.employee, self.leave_type, start_date, self.to_date, self.half_day, self.half_day_date
+            )
+            if leaves:
+                args.update(dict(from_date=start_date, to_date=self.to_date, leaves=leaves * -1))
+                create_leave_ledger_entry(self, args, submit)
+    
+    def HPL_balance_minus(self):
+        new_to_dateplus = add_days(self.to_date,self.total_leave_days)
+        lwp = frappe.db.get_value("Leave Type", 'Half Paid Leave', "is_lwp")
+        doc = frappe.new_doc("Leave Ledger Entry")
+        doc.employee = self.employee
+        doc.employee_name = self.employee_name
+        doc.leave_type = 'Half Paid Leave'
+        doc.transaction_type = 'Leave Application'
+        doc.transaction_name = self.name
+        doc.leaves = self.total_leave_days * -2
+        doc.company = self.company
+        doc.from_date = self.from_date
+        doc.to_date =new_to_dateplus
+        doc.is_lwp=lwp,
+        doc.holiday_list=get_holiday_list_for_employee(self.employee, raise_exception=True) or ''
+        doc.flags.ignore_validate = True
+        doc.flags.ignore_permissions = 1
+        doc.docstatus = 1
+        doc.db_insert()
+        
     def validate_optional_leave(self):
         leave_period = get_leave_period(self.from_date, self.to_date, self.company)
         if not leave_period:
@@ -163,245 +231,161 @@ class CustomLeaveApplication(Document):
                     _("{0} is not in Optional Holiday List").format(formatdate(day)), NotAnOptionalHoliday
                 )
             day = add_days(day, 1)
-
-    def send_share_leave_notice(self):
-
-        leave_approver = self.leave_approver
-        leave_recommender = self.leave_recommender
-        leave_recommender_second = self.leave_recommender_second
-        leave_recommender_third = self.leave_recommender_third
-
-        leave_delegate_recommender = check_delegate(self.leave_recommender)
-        leave_delegate_recommender_second = check_delegate(self.leave_recommender_second)
-        leave_delegate_recommender_third = check_delegate(self.leave_recommender_third)
-        leave_delegate_approver = check_delegate(self.leave_approver)
-
-        # frappe.throw(leave_delegate_approver)
-        # if total recommender 3, then the doc share to the three recommender
-        # frappe.msgprint(frappe.as_json(self.total_recommender))
-
-        # p: share doc 0 = recommender and 1 = approver
-
-        if self.status != 'Approved':
-            # frappe.msgprint(frappe.as_json(self.total_recommender))
-            if self.total_recommender == 3:
-                # frappe.throw('recommender 3')
-                if self.recommender_first and self.recommender_second and self.recommender_third:
-                    # if all three recommender are  recommended the status is set Recommended
-                    frappe.db.set_value("Leave Application", self.name, 'status', 'Recommended', update_modified=False)
-                    if leave_delegate_approver:
-                        share_doc_with_approver(self, leave_approver)
-                        share_doc_with_approver(self, leave_delegate_approver)
-                        if frappe.db.get_single_value("HR Settings", "send_leave_notification"):
-                            notify_leave_approver(self)
-                            notify_leave_email(self, leave_delegate_approver)
-                    else:
-                        share_doc_with_approver(self, leave_approver)
-                        if frappe.db.get_single_value("HR Settings", "send_leave_notification"):
-                            notify_leave_approver(self)
-
-                elif self.recommender_first and self.recommender_second:
-                    if leave_delegate_recommender_third:
-                        share_doc_with_recommender(self, leave_delegate_recommender_third)
-                        share_doc_with_recommender(self, leave_recommender_third)
-                        if frappe.db.get_single_value("HR Settings", "send_leave_notification"):
-                            notify_leave_email(self, leave_delegate_recommender_third)
-                            notify_leave_email(self, leave_recommender_third)
-                    else:
-                        share_doc_with_recommender(self, leave_recommender_third)
-                        if frappe.db.get_single_value("HR Settings", "send_leave_notification"):
-                            notify_leave_email(self, leave_recommender_third)
-                elif self.recommender_first:
-                    if leave_delegate_recommender_second:
-                        share_doc_with_recommender(self, leave_delegate_recommender_second)
-                        share_doc_with_recommender(self, leave_recommender_second)
-                        if frappe.db.get_single_value("HR Settings", "send_leave_notification"):
-                            notify_leave_email(self, leave_delegate_recommender_second)
-                            notify_leave_email(self, leave_recommender_second)
-                    else:
-                        share_doc_with_recommender(self, leave_recommender_second)
-                        if frappe.db.get_single_value("HR Settings", "send_leave_notification"):
-                            notify_leave_email(self, leave_recommender_second)
-                else:
-                    if leave_delegate_recommender:
-                        share_doc_with_recommender(self, leave_delegate_recommender)
-                        share_doc_with_recommender(self, leave_recommender)
-                        if frappe.db.get_single_value("HR Settings", "send_leave_notification"):
-                            notify_leave_email(self, leave_delegate_recommender)
-                            notify_leave_email(self, leave_recommender)
-                    else:
-                        share_doc_with_recommender(self, leave_recommender)
-                        if frappe.db.get_single_value("HR Settings", "send_leave_notification"):
-                            notify_leave_email(self, leave_recommender)
-
-            # if total recommender 2, then the doc share to the two recommender
-            elif self.total_recommender == 2:
-                if self.recommender_first and self.recommender_second:
-                    # if all two recommender are  recommended  the status is set Recommended
-                    frappe.db.set_value("Leave Application", self.name, 'status', 'Recommended', update_modified=False)
-                    if leave_delegate_approver:
-                        share_doc_with_approver(self, leave_approver)
-                        share_doc_with_approver(self, leave_delegate_approver)
-                        if frappe.db.get_single_value("HR Settings", "send_leave_notification"):
-                            notify_leave_approver(self)
-                            notify_leave_email(self, leave_delegate_approver)
-                    else:
-                        share_doc_with_approver(self, leave_approver)
-                        if frappe.db.get_single_value("HR Settings", "send_leave_notification"):
-                            notify_leave_approver(self)
-                elif self.recommender_first:
-                    if leave_delegate_recommender_second:
-                        share_doc_with_recommender(self, leave_delegate_recommender_second)
-                        share_doc_with_recommender(self, leave_recommender_second)
-                        if frappe.db.get_single_value("HR Settings", "send_leave_notification"):
-                            notify_leave_email(self, leave_delegate_recommender_second)
-                            notify_leave_email(self, leave_recommender_second)
-                    else:
-                        share_doc_with_recommender(self, leave_recommender_second)
-                        if frappe.db.get_single_value("HR Settings", "send_leave_notification"):
-                            notify_leave_email(self, leave_recommender_second)
-                else:
-                    if leave_delegate_recommender:
-                        share_doc_with_recommender(self, leave_delegate_recommender)
-                        share_doc_with_recommender(self, leave_recommender)
-                        if frappe.db.get_single_value("HR Settings", "send_leave_notification"):
-                            notify_leave_email(self, leave_delegate_recommender)
-                            notify_leave_email(self, leave_recommender)
-                    else:
-                        share_doc_with_recommender(self, leave_recommender)
-                        if frappe.db.get_single_value("HR Settings", "send_leave_notification"):
-                            notify_leave_email(self, leave_recommender)
-            # if total recommender one, then the doc share to the one recommender
-            elif self.total_recommender == 1:
-                if self.recommender_first:
-                    # if all one recommender are recommended the status is set Recommended
-                    frappe.db.set_value("Leave Application", self.name, 'status', 'Recommended', update_modified=False)
-                    if leave_delegate_approver:
-                        share_doc_with_approver(self, leave_approver)
-                        share_doc_with_approver(self, leave_delegate_approver)
-                        if frappe.db.get_single_value("HR Settings", "send_leave_notification"):
-                            # frappe.throw("Delegate site")
-                            notify_leave_approver(self)
-                            notify_leave_email(self, leave_delegate_approver)
-                    else:
-                        share_doc_with_approver(self, leave_approver)
-                        if frappe.db.get_single_value("HR Settings", "send_leave_notification"):
-                            notify_leave_approver(self)
-                else:
-                    if leave_delegate_recommender:
-                        share_doc_with_recommender(self, leave_delegate_recommender)
-                        share_doc_with_recommender(self, leave_recommender)
-                        if frappe.db.get_single_value("HR Settings", "send_leave_notification"):
-                            notify_leave_email(self, leave_delegate_recommender)
-                            notify_leave_email(self, leave_recommender)
-                    else:
-                        share_doc_with_recommender(self, leave_recommender)
-                        if frappe.db.get_single_value("HR Settings", "send_leave_notification"):
-                            notify_leave_email(self, leave_recommender)
-
-            elif self.total_recommender == 0:
-                if self.status == "Open" and self.docstatus < 1:
-                    if leave_delegate_approver:
-                        # frappe.throw('leave_delegate_approver')
-                        share_doc_with_approver(self, leave_approver)
-                        share_doc_with_approver(self, leave_delegate_approver)
-                        if frappe.db.get_single_value("HR Settings", "send_leave_notification"):
-                            notify_leave_approver(self)
-                            notify_leave_email(self, leave_delegate_approver)
-                    else:
-                        share_doc_with_approver(self, leave_approver)
-                        if frappe.db.get_single_value("HR Settings", "send_leave_notification"):
-                            notify_leave_approver(self)
-                else:
-                    share_doc_with_approver(self, leave_approver)
-                    if frappe.db.get_single_value("HR Settings", "send_leave_notification"):
-                        notify_leave_approver(self)
-    # else:
-    # 	frappe.throw('now approved')
-
+            
+    def validate_leave_overlap(self):
+        if not self.name:
+            # hack! if name is null, it could cause problems with !=
+            self.name = "New Leave Application"
+            
+        for d in frappe.db.sql(
+            """
+            select
+                name, leave_type, posting_date, from_date, to_date, total_leave_days, half_day_date
+			from `tabLeave Application`
+			where employee = %(employee)s and docstatus < 2 and status in ('Open', 'Approved')
+			and to_date >= %(from_date)s and from_date <= %(to_date)s
+			and name != %(name)s""",
+			{
+				"employee": self.employee,
+				"from_date": self.from_date,
+				"to_date": self.to_date,
+				"name": self.name,
+			},
+			as_dict=1,
+		):
+            if (
+                cint(self.half_day) == 1
+                and getdate(self.half_day_date) == getdate(d.half_day_date)
+                and (
+                    flt(self.total_leave_days) == 0.5
+                    or getdate(self.from_date) == getdate(d.to_date)
+                    or getdate(self.to_date) == getdate(d.from_date)
+                )
+                ):
+                total_leaves_on_half_day = self.get_total_leaves_on_half_day()
+                if total_leaves_on_half_day >= 1:
+                    self.throw_overlap_error(d)
+            else:
+                self.throw_overlap_error(d)
+                
+    def throw_overlap_error(self, d):
+        form_link = get_link_to_form("Leave Application", d.name)
+        msg = _("Employee {0} has already applied for {1} between {2} and {3} : {4}").format(
+            self.employee, d["leave_type"], formatdate(d["from_date"]), formatdate(d["to_date"]), form_link
+        )
+        frappe.throw(msg, OverlapError)
+        
+    def validate_max_days(self):
+        max_days = frappe.db.get_value("Leave Type", self.leave_type, "max_continuous_days_allowed")
+        if max_days and self.total_leave_days > cint(max_days):
+            frappe.throw(_("Leave of type {0} cannot be longer than {1}").format(self.leave_type, max_days))
+            
+    def set_half_day_date(self):
+        if self.from_date == self.to_date and self.half_day == 1:
+            self.half_day_date = self.from_date
+            
+        if self.half_day == 0:
+            self.half_day_date = None
+    
+    def validate_leave_balance(self):
+        #int(self.leave_balance)
+        if int(self.leave_balance) <= 0 and self.leave_type_name != 'Other Leave':
+            msg = _("Warning: Insufficient leave balance for Leave Type {0} in this allocation.").format(
+					frappe.bold(self.leave_type)
+				)
+            frappe.throw(msg)
+            
+    def validate_leave_approver(self):
+        if self.leave_approver == frappe.session.user:
+            frappe.throw("Invalid leave approver name selected.")
+            
+    def get_total_leaves_on_half_day(self):
+        leave_count_on_half_day_date = frappe.db.sql(
+            """select count(name) from `tabLeave Application`
+            where employee = %(employee)s
+            and docstatus < 2
+            and status in ('Open', 'Approved')
+            and half_day = 1
+            and half_day_date = %(half_day_date)s
+            and name != %(name)s""",
+            {"employee": self.employee, "half_day_date": self.half_day_date, "name": self.name},
+        )[0][0]
+        
+        return leave_count_on_half_day_date * 0.5      
 
 @frappe.whitelist()
-def set_leave_status(leave_application_name, action_type, total_recommender, recommender_first, recommender_second,
-                     recommender_third, leave_type, leave_data):
-    # return action_type
-    if action_type == 'recommond':
-        if recommender_first == "1":
-            frappe.db.set_value("Leave Application", {'name': leave_application_name}, {'recommender_first': 1},
-                                update_modified=False)
-        # if total_recommender=="1":
-        # 	frappe.db.set_value("Leave Application",{"name":leave_application_name}, {'status':'Recommended'},update_modified=False)
+def get_approvers(doctype, txt, searchfield, start, page_len, filters):
+    doctype = "User"
+    conditions = []
+    fields = get_fields(doctype, ["email", "full_name"])
 
-        if recommender_second == "1":
-            frappe.db.set_value("Leave Application", {'name': leave_application_name}, {'recommender_second': 1},
-                                update_modified=False)
-        # if total_recommender=="2":
-        # 	frappe.db.set_value("Leave Application",{"name":leave_application_name}, {'status':'Recommended'},update_modified=False)
-
-        if recommender_third == "1":
-            frappe.db.set_value("Leave Application", {'name': leave_application_name}, {'recommender_third': 1},
-                                update_modified=False)
-        # if total_recommender=="3":
-        # 	frappe.db.set_value("Leave Application",{"name":leave_application_name}, {'status':'Recommended'},update_modified=False)
-
-    if action_type == "not_recommond" or action_type == "not_approved":
-        frappe.db.set_value("Leave Application", {"name": leave_application_name}, {'status': 'Rejected'},
-                            update_modified=False)
-
-    ##frappe.db.set_value("Leave Application",'HR-LAP-2022-00117','status','Rejected', update_modified=False)
-
-    if action_type == 'approved':
-        # pass
-        frappe.db.set_value("Leave Application", {"name": leave_application_name}, {'status': 'Approved'},
-                            update_modified=False)
-
-    return action_type
-
-
-def get_allocation_expiry_for_cf_leaves(
-        employee: str, leave_type: str, to_date: str, from_date: str
-) -> str:
-    """Returns expiry of carry forward allocation in leave ledger entry"""
-    expiry = frappe.get_all(
-        "Leave Ledger Entry",
-        filters={
-            "employee": employee,
-            "leave_type": leave_type,
-            "is_carry_forward": 1,
-            "transaction_type": "Leave Allocation",
-            "to_date": ["between", (from_date, to_date)],
-            "docstatus": 1,
-        },
-        fields=["to_date"],
+    return frappe.db.sql(
+        """select {fields} from `tabUser`
+		where  docstatus < 2
+			and ({key} like %(txt)s
+				or full_name like %(txt)s)
+			{fcond} {mcond}
+		order by
+			(case when locate(%(_txt)s, name) > 0 then locate(%(_txt)s, name) else 99999 end),
+			(case when locate(%(_txt)s, full_name) > 0 then locate(%(_txt)s, full_name) else 99999 end),
+			idx desc,
+			name, full_name
+		limit %(page_len)s offset %(start)s""".format(
+            **{
+                "fields": ", ".join(fields),
+                "key": searchfield,
+                "fcond": get_filters_cond(doctype, filters, conditions),
+                "mcond": get_match_cond(doctype),
+            }
+        ),
+        {"txt": "%%%s%%" % txt, "_txt": txt.replace("%", ""), "start": start, "page_len": page_len},
     )
-    return expiry[0]["to_date"] if expiry else ""
+    
+@frappe.whitelist()
+def get_fields(doctype, fields=None):
+    if fields is None:
+        fields = []
+    meta = frappe.get_meta(doctype)
+    fields.extend(meta.get_search_fields())
 
+    if meta.title_field and not meta.title_field.strip() in fields:
+        fields.insert(1, meta.title_field.strip())
+
+    return unique(fields)
 
 @frappe.whitelist()
-def notify_leave_approver(self):
-    # frappe.msgprint("Notify")
-    if self.leave_approver:
-        parent_doc = frappe.get_doc("Leave Application", self.name)
-        args = parent_doc.as_dict()
+def set_leave_status(leave_application_name,doctype, user,action_type, leave_type):
+    current_date_time = frappe.utils.now_datetime()
+    if action_type == 'Recommended':
+        frappe.db.set_value("Leave Recommender",{'parent': leave_application_name,'recommender':user,'parenttype':doctype},{'status': 'Recommended','docstatus':1,'recommend_date_time':current_date_time},update_modified=False)
 
-        template = frappe.db.get_single_value("HR Settings", "leave_approval_notification_template")
-        if not template:
-            frappe.msgprint(
-                _("Please set default template for Leave Approval Notification in HR Settings.")
-            )
-            return
-        email_template = frappe.get_doc("Email Template", template)
-        message = frappe.render_template(email_template.response_html, args)
+        status = 'Open'
 
-        notify(self,
-               {
-                   # for post in messages
-                   "message": message,
-                   "message_to": self.leave_approver,
-                   # for email
-                   # "subject": email_template.subject,
-                   "subject": email_template.subject + " " + self.employee_name + " from " + self.from_date + " to " + self.to_date,
-               }
-               )
+        recommender_data = frappe.db.count('Leave Recommender',{'parent':leave_application_name,'status':'Recommended','parenttype':doctype})
+        total_recommder = frappe.db.count('Leave Recommender',{'parent':leave_application_name})
+        
+        if recommender_data:
+            val = frappe.as_json(recommender_data)
+            if val == frappe.as_json(total_recommder):
+                #frappe.db.set_value("Leave Application",{'name': leave_application_name},{'status': 'Recommended'},update_modified=False)
+                status = 'Recommended'
+                return status
+
+    elif action_type == 'Rejected':
+        frappe.db.set_value("Leave Recommender",{'parent': leave_application_name,'recommender':user,'parenttype':doctype},{'status': 'Rejected','docstatus':1,'recommend_date_time':current_date_time},update_modified=False)
+        
+        frappe.db.set_value("Leave Application",{'name': leave_application_name},{'status': 'Rejected','docstatus':1,'doc_approved_date':current_date_time},update_modified=False)
+        
+        status = 'Rejected'
+
+    return status
+
+@frappe.whitelist()
+def doc_status_update(docname,action_type,leave_type):
+    if action_type == 'Approved':
+        frappe.db.set_value("Leave Application", {"name": docname}, {'status': 'Approved','doc_approved_date':frappe.utils.now_datetime()},update_modified=False)
+        
+    return action_type
 
 
 @frappe.whitelist()
@@ -428,8 +412,34 @@ def notify(self, args):
             frappe.msgprint(_("Email sent to {0}").format(contact))
         except frappe.OutgoingEmailError:
             pass
+        
+@frappe.whitelist()
+def create_or_update_attendance(self, attendance_name, date):
+    status = "Half Day" if self.half_day_date and getdate(date) == getdate(self.half_day_date) else "On Leave"
 
-
+    if attendance_name:
+        # update existing attendance, change absent to on leave
+        doc = frappe.get_doc('Attendance', attendance_name)
+        if doc.status != status:
+            doc.db_set({
+                'status': status,
+                'leave_type': self.leave_type,
+                'leave_application': self.name
+            })
+    else:
+        # make new attendance and submit it
+        doc = frappe.new_doc("Attendance")
+        doc.employee = self.employee
+        doc.employee_name = self.employee_name
+        doc.attendance_date = date
+        doc.company = self.company
+        doc.leave_type = self.leave_type
+        doc.leave_application = self.name
+        doc.status = status
+        doc.flags.ignore_validate = True
+        doc.insert(ignore_permissions=True)
+        doc.submit()
+        
 @frappe.whitelist()
 def validate_back_dated_application(self):
     future_allocation = frappe.db.sql(
@@ -446,7 +456,6 @@ def validate_back_dated_application(self):
                 "Leave cannot be applied/cancelled before {0}, as leave balance has already been carry-forwarded in the future leave allocation record {1}"
             ).format(formatdate(future_allocation[0].from_date), future_allocation[0].name)
         )
-
 
 @frappe.whitelist()
 def update_attendance(self):
@@ -476,36 +485,7 @@ def update_attendance(self):
             continue
 
         create_or_update_attendance(self, attendance_name, date)
-
-
-@frappe.whitelist()
-def create_or_update_attendance(self, attendance_name, date):
-    status = "Half Day" if self.half_day_date and getdate(date) == getdate(self.half_day_date) else "On Leave"
-
-    if attendance_name:
-        # update existing attendance, change absent to on leave
-        doc = frappe.get_doc('Attendance', attendance_name)
-        if doc.status != status:
-            doc.db_set({
-                'status': status,
-                'leave_type': self.leave_type,
-                'leave_application': self.name
-            })
-    else:
-        # make new attendance and submit it
-        doc = frappe.new_doc("Attendance")
-        doc.employee = self.employee
-        doc.employee_name = self.employee_name
-        doc.attendance_date = date
-        doc.company = self.company
-        doc.leave_type = self.leave_type
-        doc.leave_application = self.name
-        doc.status = status
-        doc.flags.ignore_validate = True
-        doc.insert(ignore_permissions=True)
-        doc.submit()
-
-
+        
 @frappe.whitelist()
 def notify_employee(self):
     employee = frappe.get_doc("Employee", self.employee)
@@ -531,216 +511,116 @@ def notify_employee(self):
         "notify": "employee"
     })
 
+@frappe.whitelist()
+def get_employee_data(user_id):
+    data = frappe.db.get_value('Employee', {'user_id':user_id}, ['department', 'designation','employee_id','employee_name','cell_number','salutation'],as_dict =1)
+    return data
 
 @frappe.whitelist()
-def check_delegate(user):
-    today = date.today()
-    values = {'owner': user, "today": today}
-
-    check_delegate = frappe.db.sql(
-        "SELECT delegate_to FROM `tabDelegate Responsibility`  WHERE %(today)s BETWEEN from_date AND to_date and owner=%(owner)s",
-        values=values, as_dict=True)
-
-    if check_delegate:
-        user = check_delegate[0].delegate_to
-    else:
-        user = None
-    return user
-
-
-@frappe.whitelist()
-def get_employee_by_position(emp_main_department, postion_department, position):
-    if position == "HOD":
-        values = {'department': emp_main_department, "position": position}
-        employee_postion_detail = frappe.db.sql(
-            "SELECT epd.*,e.user_id FROM `tabEmployee Position Details` as epd INNER JOIN `tabEmployee` as e on epd.parent=e.name WHERE epd.department=%(department)s and epd.position=%(position)s",
-            values=values, as_dict=True)
-        return employee_postion_detail
-    else:
-        values = {"position": position, 'department': emp_main_department}
-        employee_postion_detail = frappe.db.sql(
-            "SELECT epd.*,e.user_id FROM `tabEmployee Position Details` as epd INNER JOIN `tabEmployee` as e on epd.parent=e.name WHERE epd.position=%(position)s and epd.department=%(department)s ",
-            values=values, as_dict=True)
-        return employee_postion_detail
-
-
-def notify_leave_email(self, email_id):
-    if email_id:
-        parent_doc = frappe.get_doc('Leave Application', self.name)
-        args = parent_doc.as_dict()
-
-        template = frappe.db.get_single_value(
-            'HR Settings', 'leave_approval_notification_template')
-        if not template:
-            frappe.msgprint(_("Please set default template for Leave Approval Notification in HR Settings."))
-
-            return
-        email_template = frappe.get_doc("Email Template", template)
-        message = frappe.render_template(email_template.response, args)
-        notify(self, {
-            # for post in messages
-            "message": message,
-            "message_to": email_id,
-            # for email
-            "subject": email_template.subject + " " + self.employee_name + " from " + self.from_date + " to " + self.to_date,
-        })
-
-
-# total recommeder count function
-def after_insert_recommeder(doc, method):
-    data = doc.total_recommender
-    if doc.leave_recommender and not doc.leave_recommender_second and not doc.leave_recommender_third:
-        data = 1
-    if doc.leave_recommender and doc.leave_recommender_second and not doc.leave_recommender_third:
-        # frappe.throw('2')
-        data = 2
-    if doc.leave_recommender and doc.leave_recommender_second and doc.leave_recommender_third:
-        # frappe.throw('3')
-        data = 3
-
-    if not doc.leave_recommender and not doc.leave_recommender_second and not doc.leave_recommender_third:
-        # frappe.throw('0')
-        data = 0
-
-    doc.total_recommender = data
-    doc.update({"doc.total_recommender": data})
-
-
-# doc.save()
-# End total recommeder count function
-def HPL_balance_minus(self):
-    new_to_dateplus = add_days(self.to_date,self.total_leave_days)
-    lwp = frappe.db.get_value("Leave Type", 'Half Paid Leave', "is_lwp")
-    doc = frappe.new_doc("Leave Ledger Entry")
-    doc.employee = self.employee
-    doc.employee_name = self.employee_name
-    doc.leave_type = 'Half Paid Leave'
-    doc.transaction_type = 'Leave Application'
-    doc.transaction_name = self.name
-    doc.leaves = self.total_leave_days * -2
-    doc.company = self.company
-    doc.from_date = self.from_date
-    doc.to_date =new_to_dateplus
-    doc.is_lwp=lwp,
-    doc.holiday_list=get_holiday_list_for_employee(self.employee, raise_exception=True) or ''
-    doc.flags.ignore_validate = True
-    doc.flags.ignore_permissions = 1
-    doc.docstatus = 1
-    doc.db_insert()
-
-
-@frappe.whitelist()
-def get_approvers_old(doctype, txt, searchfield, start, page_len, filters):
-    approvers = frappe.db.sql(
-        """select u.name,u.first_name,u.last_name from `tabUser` u INNER JOIN `tabEmployee` e ON u.name = e.user_id""")
-    return set(tuple(approver) for approver in approvers)
-
-
-@frappe.whitelist()
-def get_approvers(doctype, txt, searchfield, start, page_len, filters):
-    doctype = "User"
-    conditions = []
-    fields = get_fields(doctype, ["email", "full_name"])
-
-    return frappe.db.sql(
-        """select {fields} from `tabUser`
-		where  docstatus < 2
-			and ({key} like %(txt)s
-				or full_name like %(txt)s)
-			{fcond} {mcond}
-		order by
-			(case when locate(%(_txt)s, name) > 0 then locate(%(_txt)s, name) else 99999 end),
-			(case when locate(%(_txt)s, full_name) > 0 then locate(%(_txt)s, full_name) else 99999 end),
-			idx desc,
-			name, full_name
-		limit %(page_len)s offset %(start)s""".format(
-            **{
-                "fields": ", ".join(fields),
-                "key": searchfield,
-                "fcond": get_filters_cond(doctype, filters, conditions),
-                "mcond": get_match_cond(doctype),
-            }
-        ),
-        {"txt": "%%%s%%" % txt, "_txt": txt.replace("%", ""), "start": start, "page_len": page_len},
-    )
-
-
-@frappe.whitelist()
-def get_approvers_oldone(doctype, txt, searchfield, start, page_len, filters):
-    doctype = "Employee"
-    conditions = []
-    fields = get_fields(doctype, ["user_id", "employee_name"])
-
-    return frappe.db.sql(
-        """select {fields} from `tabEmployee`
-		where status in ('Active', 'Suspended')
-			and docstatus < 2
-			and ({key} like %(txt)s
-				or employee_name like %(txt)s)
-			{fcond} {mcond}
-		order by
-			(case when locate(%(_txt)s, name) > 0 then locate(%(_txt)s, name) else 99999 end),
-			(case when locate(%(_txt)s, employee_name) > 0 then locate(%(_txt)s, employee_name) else 99999 end),
-			idx desc,
-			name, employee_name
-		limit %(page_len)s offset %(start)s""".format(
-            **{
-                "fields": ", ".join(fields),
-                "key": searchfield,
-                "fcond": get_filters_cond(doctype, filters, conditions),
-                "mcond": get_match_cond(doctype),
-            }
-        ),
-        {"txt": "%%%s%%" % txt, "_txt": txt.replace("%", ""), "start": start, "page_len": page_len},
-    )
-
-
-@frappe.whitelist()
-def update_website_context(context):
-    context.update(dict(
-        splash_image='/files/iiti-splash.png'
-    ))
-    return context
-
-@frappe.whitelist()
-def cancel_leave_application(employee,doctype,docname,status):
+def cancel_leave_application(employee,doctype,docname,docstatus,reason_for_cancel,status):
     if status == 'Cancelled':
+        leave_application = frappe.get_value(doctype,{"name": docname},["*"],as_dict = True)
+        if docstatus == 'Open':
+            cancel_leave_email(docname,leave_application.owner,reason_for_cancel)
+        elif docstatus == 'Recommended':
+            recommender_data = frappe.db.get_list("Leave Recommender", filters={'parent': docname},fields='*',ignore_permissions = True)
+            if recommender_data:
+                for re_list in recommender_data:
+                    cancel_leave_email(docname,re_list.recommender,reason_for_cancel)
         data = frappe.db.set_value(doctype, {"name": docname}, {'status': status,'docstatus':2},update_modified=False)
     
     return data
 
+@frappe.whitelist()
+def get_date_diff(employee,leave_type,from_date,to_date,other_leave_type):
+    if leave_type == 'Other Leave' and other_leave_type == 'Headquarter Leave':
+        
+        number_of_days = date_diff(to_date, from_date) + 1
+        
+        return number_of_days
+    
+@frappe.whitelist()
+def cancel_leave_email(docname,User,reason):
+    if User:
+        template = 'Cancel Leave Notification'
+        if not template:
+            frappe.msgprint(_("Please set default template for Leave Status Notification in HR Settings."))
+            
+            return
+        
+        parent_doc = frappe.get_doc('Leave Application',docname)
+        args = parent_doc.as_dict()
+        args.update({'reason':reason})
+        email_template = frappe.get_doc("Email Template", template)
+        
+        message = frappe.render_template(email_template.response_html, args)
+        
+        notify(args,{
+                "message":message,
+                "message_to":User,
+                "subject":email_template.subject,
+            })
+@frappe.whitelist()
+def leave_discussion_email_send(contant,email_id,doctype,docname):
+    if email_id:
+        parent_doc = frappe.get_doc(doctype,docname)
+        args = parent_doc.as_dict()
+        args.update({'resone':contant})
+        
+        template = 'Global Discussion For Document'
+        
+        if not template:
+            frappe.msgprint(frappe._("Please set default template for Discussion."))
+            return
+        
+        email_template = frappe.get_doc("Email Template",template)
+        message = frappe.render_template(email_template.response_html,args)
+        notify(args,{
+            "message":message,
+            "message_to":email_id,
+            "subject":email_template.subject + " " + docname,
+        })
+        
+@frappe.whitelist()
+def get_number_of_leave_days(
+	employee: str,
+	leave_type: str,
+	from_date: str,
+	to_date: str,
+	half_day: Optional[int] = None,
+	half_day_date: Optional[str] = None,
+	holiday_list: Optional[str] = None,
+) -> float:
+	"""Returns number of leave days between 2 dates after considering half day and holidays
+	(Based on the include_holiday setting in Leave Type)"""
+	number_of_days = 0
+	if cint(half_day) == 1:
+		if getdate(from_date) == getdate(to_date):
+			number_of_days = 0.5
+		elif half_day_date and getdate(from_date) <= getdate(half_day_date) <= getdate(to_date):
+			number_of_days = date_diff(to_date, from_date) + 0.5
+		else:
+			number_of_days = date_diff(to_date, from_date) + 1
+	else:
+		number_of_days = date_diff(to_date, from_date) + 1
+
+	if not frappe.db.get_value("Leave Type", leave_type, "include_holiday"):
+		number_of_days = flt(number_of_days) - flt(
+			get_holidays(employee, from_date, to_date, holiday_list=holiday_list)
+		)
+	return number_of_days
 
 @frappe.whitelist()
-def get_fields(doctype, fields=None):
-    if fields is None:
-        fields = []
-    meta = frappe.get_meta(doctype)
-    fields.extend(meta.get_search_fields())
+def get_holidays(employee, from_date, to_date, holiday_list=None):
+	"""get holidays between two dates for the given employee"""
+	if not holiday_list:
+		holiday_list = get_holiday_list_for_employee(employee)
 
-    if meta.title_field and not meta.title_field.strip() in fields:
-        fields.insert(1, meta.title_field.strip())
+	holidays = frappe.db.sql(
+		"""select count(distinct holiday_date) from `tabHoliday` h1, `tabHoliday List` h2
+		where h1.parent = h2.name and h1.holiday_date between %s and %s
+		and h2.name = %s""",
+		(from_date, to_date, holiday_list),
+	)[0][0]
 
-    return unique(fields)
-
-
-def share_doc_with_recommender(doc, user):
-    # if approver does not have permissions, share
-    if not frappe.has_permission(doc=doc, ptype="write", user=user):
-        frappe.share.add_docshare(doc.doctype, doc.name, user, write=1,
-                                  flags={"ignore_share_permission": True})
-
-        frappe.msgprint(_("Shared with the user {0} with {1} access").format(
-            user, frappe.bold("submit"), alert=True))
-
-    # remove shared doc if approver changes
-    doc_before_save = doc.get_doc_before_save()
-    if doc_before_save:
-        approvers = {
-            "Leave Application": "leave_recommender",
-            "Expense Claim": "expense_approver",
-            "Shift Request": "approver"
-        }
-
-        approver = approvers.get(doc.doctype)
-        if doc_before_save.get(approver) != doc.get(approver):
-            frappe.share.remove(doc.doctype, doc.name, doc_before_save.get(approver))
+	return holidays
