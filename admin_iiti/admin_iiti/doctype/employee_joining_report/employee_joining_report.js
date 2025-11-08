@@ -37,7 +37,7 @@ frappe.ui.form.on('Employee Joining Report', {
 					frappe.msgprint('Joining Report already Approved');
 				}).addClass("btn-info").css({ 'color': '#ffffff', 'font-weight': 'bold', 'background-color': '#1eb817ab' })
 			}
-			//p: reporting date validation added 
+			//p: reporting date validation add
 
 			if(frm.doc.reporting_date){
 				var from_date = new Date(frm.doc.reporting_date);
