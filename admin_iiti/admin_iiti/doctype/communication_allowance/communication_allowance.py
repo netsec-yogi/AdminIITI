@@ -21,17 +21,18 @@ from frappe.utils import (
 )
 from frappe.model.document import Document
 from frappe.model.naming import getseries
-class TransportAllowance(Document):
+
+class CommunicationAllowance(Document):
     def autoname(self):
         current_year = getdate(today()).year
-        prefix = f"IITI-Admin-TPTA-{current_year}"
+        prefix = f"IITI-Admin-CA-{current_year}"
         x = getseries(prefix,3)
         
         if self.pnt_no:
             self.name = f"IITI/Admin/PNT-{self.pnt_no}/{current_year}/{x}"
         else:
             self.name = f"IITI/Admin/PNT-{x}/{current_year}/{x}"
-            
+    
     def on_update(self):
         if self.i_confirm:
             approval_data = frappe.get_doc("Note Sheet Approval Process",self.doctype,as_dict = 1)
@@ -42,7 +43,7 @@ class TransportAllowance(Document):
                         self.notify_document(ad.approver_email, 1)
             else:
                 frappe.msgprint(_("Please set approval stage in Note Sheet Approval Process"))
-                        
+              
     def on_submit(self):
         if self.status == 'Approved':
             employee = frappe.get_doc("Employee",self.employee)
@@ -62,7 +63,7 @@ class TransportAllowance(Document):
             args = parent_doc.as_dict()
 
             if flags == 1:
-                template = 'Transport Allowance Notification'
+                template = 'Communication Allowance Notification'
             else:
                 template = ''
 
@@ -101,7 +102,8 @@ class TransportAllowance(Document):
                     frappe.msgprint(_("Email sent to {0}").format(contact))
                 except frappe.OutgoingEmailError:
                     pass
-                
+        
+        
 @frappe.whitelist()
 def update_notesheet_status(doctype, document_name, status, user):
     if user:
@@ -166,7 +168,3 @@ def update_notesheet_status(doctype, document_name, status, user):
             doc.submit()
         
         return status
-                
-                
-            
-        

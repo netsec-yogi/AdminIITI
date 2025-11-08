@@ -1,0 +1,212 @@
+{
+ "actions": [],
+ "autoname": "naming_series:",
+ "creation": "2025-09-30 16:01:27.499864",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "naming_series",
+  "employee",
+  "employee_name",
+  "department",
+  "leave_application",
+  "pay_level",
+  "remark",
+  "column_break_7",
+  "pnt_no",
+  "joining_report",
+  "designation",
+  "leave_from_date",
+  "leave_to_date",
+  "month_of_ca",
+  "section_break_15",
+  "i_confirm",
+  "status",
+  "approver_details",
+  "follow_via_email",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Naming Series",
+   "options": "IITI-Admin-CA-.YYYY.-.###",
+   "reqd": 1
+  },
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "in_standard_filter": 1,
+   "label": "Employee",
+   "options": "Employee",
+   "reqd": 1
+  },
+  {
+   "fieldname": "employee_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Employee Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "in_standard_filter": 1,
+   "label": "Department",
+   "options": "Department",
+   "reqd": 1
+  },
+  {
+   "fieldname": "leave_application",
+   "fieldtype": "Link",
+   "label": "Leave Application",
+   "options": "Leave Application",
+   "reqd": 1
+  },
+  {
+   "fieldname": "pay_level",
+   "fieldtype": "Link",
+   "label": "Pay Level",
+   "options": "Pay Level"
+  },
+  {
+   "fieldname": "remark",
+   "fieldtype": "Small Text",
+   "label": "Remark"
+  },
+  {
+   "fieldname": "column_break_7",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "pnt_no",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "PNT NO."
+  },
+  {
+   "fieldname": "joining_report",
+   "fieldtype": "Attach",
+   "label": "Joining Report"
+  },
+  {
+   "fieldname": "designation",
+   "fieldtype": "Link",
+   "label": "Designation",
+   "options": "Designation"
+  },
+  {
+   "fieldname": "leave_from_date",
+   "fieldtype": "Date",
+   "label": "Leave From Date"
+  },
+  {
+   "fieldname": "leave_to_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Leave To Date"
+  },
+  {
+   "fieldname": "month_of_ca",
+   "fieldtype": "Table MultiSelect",
+   "label": "Month for which Communication Allowance is not admissible",
+   "options": "TPTA Month"
+  },
+  {
+   "description": "<h5 style=\"color: red;\"><b>Attention: Once the checkbox is selected, further editing of the form is restricted.</b></h5>",
+   "fieldname": "section_break_15",
+   "fieldtype": "Section Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "i_confirm",
+   "fieldtype": "Check",
+   "label": "<b>I Confirm</b>"
+  },
+  {
+   "default": "Draft",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "options": "Draft\nOpen\nProcessed\nChecked\nRecommended\nApproved\nReturned for change\nCancelled\nRejected"
+  },
+  {
+   "fieldname": "approver_details",
+   "fieldtype": "Text",
+   "hidden": 1,
+   "label": "Approver Details"
+  },
+  {
+   "default": "1",
+   "fieldname": "follow_via_email",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "follow_via_email"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Communication Allowance",
+   "print_hide": 1,
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2025-09-30 17:09:09.853927",
+ "modified_by": "Administrator",
+ "module": "Admin IITI",
+ "name": "Communication Allowance",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [
+  {
+   "color": "Orange",
+   "title": "Open"
+  },
+  {
+   "color": "Purple",
+   "title": "Processed"
+  },
+  {
+   "color": "Blue",
+   "title": "Checked"
+  },
+  {
+   "color": "Yellow",
+   "title": "Recommended"
+  },
+  {
+   "color": "Green",
+   "title": "Approved"
+  }
+ ]
+}
