@@ -76,7 +76,7 @@ def get_rows(filters):
     )
     rows = []
     for idx, app in enumerate(apps, 1):
-        # Fetch all child table rows for this Leave Application
+        # Fetch all child table rows for this Leave Application data
         child_rows = frappe.get_all(
             "Leave Recommender",
             fields=["recommender_name"],
