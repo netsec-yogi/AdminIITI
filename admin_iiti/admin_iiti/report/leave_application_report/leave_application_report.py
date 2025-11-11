@@ -23,6 +23,7 @@ def execute(filters=None):
 def get_columns():
     return [
         # {"label": _("Sl. No."), "fieldname": "idx", "fieldtype": "Int", "width": 70},
+        
         {"label": _("Name"), "fieldname": "name", "fieldtype": "Link", "options": "Leave Application", "width": 110},
         {"label": _("PNT Number"), "fieldname": "pnt_number", "fieldtype": "Data", "width": 130},
         {"label": _("Employee Name"), "fieldname": "employee_name", "fieldtype": "Data", "width": 160},
