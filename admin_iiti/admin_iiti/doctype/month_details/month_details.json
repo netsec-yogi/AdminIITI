@@ -1,5 +1,6 @@
 {
  "actions": [],
+ "allow_import": 1,
  "allow_rename": 1,
  "autoname": "field:month_name",
  "creation": "2025-07-03 12:28:09.118514",
@@ -22,7 +23,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-07-07 15:25:04.603556",
+ "modified": "2025-07-09 10:15:53.082239",
  "modified_by": "Administrator",
  "module": "Admin IITI",
  "name": "Month Details",

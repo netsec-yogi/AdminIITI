@@ -41,7 +41,6 @@ def pending_leave_reminder():
     data = frappe.get_all('Leave Application',fields=["*"],filters=[['status','not in',['Amended','Rejected','Cancelled','Approved']],['docstatus','!=','2']])
 
     value = frappe.db.count('Leave Application',filters=[['status','not in',['Amended','Rejected','Cancelled','Approved']],['docstatus','!=','2']])
-    
     current_date = datetime.date.today()
     for leave in data:
         # Calculate the date 5 days before today's date

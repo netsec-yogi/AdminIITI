@@ -8,6 +8,11 @@ frappe.ui.form.on('Leave cancel Request', {
 	refresh: function(frm) {
 		frm.trigger("year");
 		let logged_user = frappe.session.user;
+		if(frm.is_new()){
+			var today = new Date();
+			var yyyy = today.getFullYear();
+			cur_frm.set_value("year",yyyy);
+		}
 		if (!frm.doc.employee && frappe.defaults.get_user_permissions()) {
 			const perm = frappe.defaults.get_user_permissions();
 			if (perm && perm['Employee']) {

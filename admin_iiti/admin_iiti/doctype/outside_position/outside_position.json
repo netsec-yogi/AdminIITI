@@ -27,7 +27,7 @@
   "mode_of_recruitment",
   "position_applying_for",
   "location_of_the_position",
-  "remark",
+  "remarks",
   "column_break_12",
   "position_pay_lavel",
   "position_basic_pay",
@@ -84,7 +84,7 @@
   {
    "fieldname": "designation",
    "fieldtype": "Link",
-   "label": "Designation at the time of joining",
+   "label": "Designation at the Time of Joining",
    "options": "Designation",
    "reqd": 1
   },
@@ -115,6 +115,7 @@
    "reqd": 1
   },
   {
+   "default": "Today",
    "fieldname": "application_submission_date",
    "fieldtype": "Date",
    "label": "Last Date Of Application/NOC Submission",
@@ -128,7 +129,7 @@
   {
    "fieldname": "application_form",
    "fieldtype": "Attach",
-   "label": "Application Form"
+   "label": "Joining OM/Latest DPC Order"
   },
   {
    "fieldname": "office_memorandum",
@@ -203,7 +204,7 @@
    "default": "0",
    "fieldname": "terms_and_conditions",
    "fieldtype": "Check",
-   "label": "<b>I Agree to the Terms and Conditions</b>"
+   "label": "I Agree to the Terms and Conditions"
   },
   {
    "default": "Draft",
@@ -230,9 +231,8 @@
   },
   {
    "fieldname": "position_pay_lavel",
-   "fieldtype": "Link",
+   "fieldtype": "Data",
    "label": "Position Pay Level",
-   "options": "Pay Level",
    "reqd": 1
   },
   {
@@ -258,14 +258,12 @@
    "fieldname": "current_designation",
    "fieldtype": "Link",
    "label": "Current Designation",
-   "options": "Designation",
-   "reqd": 1
+   "options": "Designation"
   },
   {
    "fieldname": "date_of_joining__present_post",
    "fieldtype": "Date",
-   "label": "Date of Joining (Present Post)",
-   "reqd": 1
+   "label": "Date of Joining (Present Post)"
   },
   {
    "fieldname": "mode_of_recruitment",
@@ -322,9 +320,9 @@
    "reqd": 1
   },
   {
-   "fieldname": "remark",
+   "fieldname": "remarks",
    "fieldtype": "Text",
-   "label": "Remark",
+   "label": "Remarks",
    "max_height": "50px"
   }
  ],
@@ -332,7 +330,7 @@
  "is_submittable": 1,
  "links": [],
  "make_attachments_public": 1,
- "modified": "2025-07-25 13:02:33.972582",
+ "modified": "2025-09-11 15:05:22.561627",
  "modified_by": "Administrator",
  "module": "Admin IITI",
  "name": "Outside Position",

@@ -1,7 +1,7 @@
 {
  "actions": [],
  "autoname": "autoincrement",
- "creation": "2025-01-09 13:10:28.999268",
+ "creation": "2025-01-09 17:36:05.669636",
  "default_view": "List",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -38,7 +38,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-01-11 13:43:11.841794",
+ "modified": "2025-01-11 13:41:11.823390",
  "modified_by": "Administrator",
  "module": "Admin IITI",
  "name": "Note Sheets Email",

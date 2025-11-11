@@ -18,11 +18,12 @@ frappe.ui.form.on('Outside Position', {
 			frm.set_df_property('outside_position_previous_applications', 'read_only', 1);
 
 		}
-		frappe.require("/assets/admin_iiti/css/outsidePosition.css");
-		if (frm.doc.terms_and_conditions && !frappe.user.has_role("HR Admin")) {
-			frm.disable_form();
-			//frm.disable_save();
+        frappe.require("/assets/admin_iiti/css/outsidePosition.css");
+        if(frm.doc.terms_and_conditions && !frappe.user.has_role("HR Admin")){
+			//frm.disable_form();
+			frm.disable_save();
 			frm.set_df_property('terms_and_conditions', 'read_only', 1);
+
 		}
 
 		if (!frm.is_new()) {
@@ -32,7 +33,7 @@ frappe.ui.form.on('Outside Position', {
 				reporting_officer.forEach(function (list, index) {
 
 					if (list.recommender == frappe.session.user && list.recommender != reviewing_officer && frm.doc.terms_and_conditions && list.status == 'Open') {
-						frm.trigger("default_remark_button_create");
+						// frm.trigger("default_remark_button_create");
 						frm.add_custom_button(__('Recommend'), function () {
 							let action_type = 'Forwarded By Reporting Officer';
 							change_status_reporting_officer(frm, action_type, logged_user);
@@ -47,7 +48,7 @@ frappe.ui.form.on('Outside Position', {
 					change_status_outside_position(frm, action_type, logged_user);
 
 				}).addClass("btn-primary").css({ 'color': '#ffffff', 'font-weight': 'bold', 'background-color': '#2490ef' });
-				frm.trigger("default_remark_button_create");
+				// frm.trigger("default_remark_button_create");
 
 				frm.add_custom_button(__('Reject'), function () {
 					let action_type = 'Rejected';
@@ -58,11 +59,30 @@ frappe.ui.form.on('Outside Position', {
 			let approver_details = get_approver_list(frm);
 			const colors = ["#2490ef", "#28a745", "#6495ed", "#28a745", "#17a2b8"]; // Define color options
 
+
+			// Add Approve with Remark button
+			// if (approver_details) {
+			// 	approver_details.forEach(function (list, index) {
+			// 		if (list.status == frm.doc.status && frappe.session.user === list.approver_email) {
+			// 			frm.add_custom_button(__(list.status_label_name), function () {
+			// 				frm.trigger("approve_with_remark");
+			// 				let action_type = list.action_status
+			// 				change_status_outside_position(frm, action_type, logged_user);
+			// 			}).addClass("btn-success").css({
+			// 				'color': '#ffffff',
+			// 				'font-weight': 'bold',
+			// 				'background-color': '#28a745'
+			// 			});
+			// 		}
+			// 	});
+			// }
+
+
 			if (approver_details) {
 				approver_details.forEach(function (list, index) {
 					if (list.status == frm.doc.status && frappe.session.user === list.approver_email) {
 						let button_color = colors[index % colors.length];
-						frm.trigger("default_remark_button_create");
+						//frm.trigger("default_remark_button_create");
 						frm.add_custom_button(__(list.status_label_name), function () {
 							let action_type = list.action_status
 							change_status_outside_position(frm, action_type, logged_user);
@@ -70,7 +90,7 @@ frappe.ui.form.on('Outside Position', {
 						}).addClass("btn-primary").css({ 'color': '#ffffff', 'font-weight': 'bold', 'background-color': button_color });
 
 						if (list.is_forwarded_to) {
-							frm.add_custom_button(__('Forword'), function () {
+							frm.add_custom_button(__('Forward'), function () {
 								let action_type = list.forwarded_status;
 								let forwared_user = list.forwarded_user;
 								change_status_forwared_message(frm, action_type, logged_user, forwared_user);
@@ -173,11 +193,12 @@ frappe.ui.form.on('Outside Position', {
 			fields.forEach(field => frm.set_value(field, null));
 		}
 	},
-	default_remark_button_create: function (frm) {
-		frm.add_custom_button(__("Remark For Approval/Recommendation"), function () {
-			frm.trigger("approver_remark");
-		}).addClass("btn-info").css({ 'color': '#ffffff', 'font-weight': 'bold', 'background-color': '#333c44' });
-	},
+
+	// default_remark_button_create: function (frm) {
+	// 	frm.add_custom_button(__("Remarkddddd For Approval/Recommendation"), function () {
+	// 		frm.trigger("approver_remark");
+	// 	}).addClass("btn-info").css({ 'color': '#ffffff', 'font-weight': 'bold', 'background-color': '#333c44' });
+	// },
 
 	reviewing_officer_name: function (frm) {
 		if (frm.doc.reviewing_officer_name) {
@@ -289,6 +310,80 @@ frappe.ui.form.on('Outside Position', {
 	default_cancel: function (frm) {
 		frm.add_custom_button(__('Cancel'),
 			() => cancel_document(frm)).addClass("btn-danger").addClass({ 'color': '#ffffff', 'font-weight': 'bold', 'background-color': '#17a2b8' });
+	},
+
+	// Approve with Remark functionality
+	approve_with_remark: function (frm) {
+		var d = new frappe.ui.Dialog({
+			title: __('Approve'),
+			fields: [
+				{
+					fieldname: 'remark',
+					fieldtype: 'Text',
+					label: 'Remark / Comment',
+					reqd: 1
+				}
+			],
+			primary_action_label: __('Save and Approve'),
+			primary_action: function () {
+				let data = d.get_values();
+				let remark = 'Approval Remark: ' + data.remark;
+
+				// Step 1: Add remark as a comment
+				frappe.call({
+					method: "frappe.desk.form.utils.add_comment",
+					args: {
+						reference_doctype: frm.doc.doctype,
+						reference_name: frm.doc.name,
+						content: __(remark),
+						comment_email: frappe.session.user,
+						comment_by: frappe.session.user_fullname
+					},
+					// callback: function (r) {
+					// 	if (!r.exc) {
+
+					// 		// Step 2: Get next dynamic status from backend (same as other buttons)
+					// 		frappe.call({
+					// 			method: "admin_iiti.admin_iiti.doctype.outside_position.outside_position.get_next_status_from_approval_stage",
+					// 			args: {
+					// 				doctype: frm.doc.doctype,
+					// 				document_name: frm.doc.name,
+					// 				current_status: frm.doc.status,
+					// 				user: frappe.session.user
+					// 			},
+					// 			callback: function (res) {
+					// 				if (res.message) {
+					// 					let next_status = res.message;
+
+					// 					// Step 3: Update document with the fetched next status
+					// 					frappe.call({
+					// 						method: "admin_iiti.admin_iiti.doctype.outside_position.outside_position.update_outside_position_status",
+					// 						args: {
+					// 							doctype: frm.doc.doctype,
+					// 							document_name: frm.doc.name,
+					// 							status: next_status,
+					// 							user: frappe.session.user
+					// 						},
+					// 						callback: function (update_res) {
+					// 							if (!update_res.exc) {
+					// 								frappe.show_alert({
+					// 									message: __("Document moved to next stage: ") + next_status,
+					// 									indicator: "green"
+					// 								});
+					// 								d.hide();
+					// 								frm.reload_doc();
+					// 							}
+					// 						}
+					// 					});
+					// 				}
+					// 			}
+					// 		});
+					// 	}
+					// }
+				});
+			}
+		});
+		d.show();
 	}
 });
 
@@ -346,34 +441,56 @@ function get_approver_list(frm) {
 }
 
 function change_status_reporting_officer(frm, action_type, logged_user) {
-	frappe.call({
-		method: "admin_iiti.admin_iiti.doctype.outside_position.outside_position.update_reporting_officer_status",
-		async: true,
-		args: {
-			doctype: frm.doc.doctype,
-			document_name: frm.doc.name,
-			status: action_type,
-			user: logged_user,
-		},
-		callback: function (r) {
-			let data = r.message;
-			if (data) {
-				cur_frm.set_value('status', data);
-				console.log("D", data);
-				// if(data == 'Open'){
-				// 	frm.reload_doc();
-				// }
-				//recommender_status_update(frm, child_doc_status)
-				recommender_comment_post(frm, action_type, user);
-				frm.reload_doc();
-				frm.refresh();
-				frappe.show_alert("Thank you for recommended the NOC Request. ");
-
+	var d = new frappe.ui.Dialog({
+		title: __(action_type == "Approved" ? "Approve" : "Recommend"),
+		fields: [
+			{
+				fieldname: 'remark',
+				fieldtype: 'Text',
+				label: 'Remark / Comment',
+				reqd: 1
 			}
+		],
+		primary_action_label: __(action_type == "Approved" ? "Save and Approve" : "Save and Recommend"),
+		primary_action: function () {
+			let data = d.get_values();
+			let remark = 'Remark: ' + data.remark;
+
+			// Step 1: Add remark as a comment
+			frappe.call({
+				method: "admin_iiti.admin_iiti.doctype.outside_position.outside_position.update_reporting_officer_status",
+				async: true,
+				args: {
+					doctype: frm.doc.doctype,
+					document_name: frm.doc.name,
+					status: action_type,
+					user: logged_user,
+				},
+				callback: function (r) {
+					let data = r.message;
+					if (data) {
+						cur_frm.set_value('status', data);
+						console.log("D", data);
+						// if(data == 'Open'){
+						// 	frm.reload_doc();
+						// }
+						//recommender_status_update(frm, child_doc_status)
+						recommender_comment_post(frm, action_type, user);
+						frm.reload_doc();
+						frm.refresh();
+						frappe.show_alert("Thank you for recommended the NOC Request. ");
+
+					}
 
 
+				}
+			});
+
+			d.hide();
 		}
 	});
+
+	d.show();
 }
 
 function recommender_status_update(frm, child_doc_status) {
@@ -396,31 +513,92 @@ function recommender_status_update(frm, child_doc_status) {
 	}
 }
 
+// function change_status_outside_position(frm, action_type, user) {
+
+// 	frappe.call({
+// 		method: "admin_iiti.admin_iiti.doctype.outside_position.outside_position.update_outside_position_status",
+// 		async: true,
+// 		args: {
+// 			doctype: frm.doc.doctype,
+// 			document_name: frm.doc.name,
+// 			status: action_type,
+// 			user: user,
+// 		},
+// 		callback: function (r) {
+// 			let data = r.message;
+// 			if (data) {
+// 				cur_frm.set_value('status', data);
+// 				//cur_frm.save();
+// 				//window.reload();
+// 				frm.reload_doc();
+// 				//recommender_comment_post(frm, action_type, user);
+// 				//frm.refresh();
+// 			}
+
+
+// 		}
+// 	});
+// }
+
 function change_status_outside_position(frm, action_type, user) {
-	frappe.call({
-		method: "admin_iiti.admin_iiti.doctype.outside_position.outside_position.update_outside_position_status",
-		async: true,
-		args: {
-			doctype: frm.doc.doctype,
-			document_name: frm.doc.name,
-			status: action_type,
-			user: user,
-		},
-		callback: function (r) {
-			let data = r.message;
-			if (data) {
-				cur_frm.set_value('status', data);
-				//cur_frm.save();
-				//window.reload();
-				frm.reload_doc();
-				recommender_comment_post(frm, action_type, user);
-				//frm.refresh();
+	console.log("action_type", action_type);
+	//btn_label = "Save and Update";
+	var d = new frappe.ui.Dialog({
+		//title: __(action_type == "Approved" ? "Approve" : "Recommend"),
+		title: action_type,
+		fields: [
+			{
+				fieldname: 'remark',
+				fieldtype: 'Text',
+				label: 'Remark / Comment',
+				reqd: 1
 			}
+		],
+		//primary_action_label: __(action_type == "Approved" ? "Save and Approve" : "Save and Recommend"),
+		primary_action_label: __("Save and " + action_type),
+		primary_action: function () {
+			let data = d.get_values();
+			let remark = 'Remark: ' + data.remark;
 
+			// Step 1: Add remark as a comment
+			frappe.call({
+				method: "frappe.desk.form.utils.add_comment",
+				args: {
+					reference_doctype: frm.doc.doctype,
+					reference_name: frm.doc.name,
+					content: __(remark),
+					comment_email: frappe.session.user,
+					comment_by: frappe.session.user_fullname
+				},
+				callback: function () {
+					// Step 2: Update status only after comment is added
+					frappe.call({
+						method: "admin_iiti.admin_iiti.doctype.outside_position.outside_position.update_outside_position_status",
+						args: {
+							doctype: frm.doc.doctype,
+							document_name: frm.doc.name,
+							status: action_type,
+							user: user,
+						},
+						callback: function (r) {
+							let data = r.message;
+							if (data) {
+								frm.set_value('status', data);
+								frappe.msgprint(__('Status updated to {0}', [data]));
+								frm.reload_doc();
+							}
+						}
+					});
+				}
+			});
 
+			d.hide();
 		}
 	});
+
+	d.show();
 }
+
 
 function change_status_forwared_message(frm, action_type, user, forwared_user) {
 	frappe.db.get_value('User', forwared_user, 'full_name')
@@ -588,20 +766,20 @@ function cancel_document(frm) {
 				callback: function (r) {
 					if (!r.exc) {
 						frappe.call({
-						method: "admin_iiti.admin_iiti.doctype.outside_position.outside_position.cancel_noc_document", // change as per your app
-						args: {
-							docname: frm.doc.name,
-							doctype: frm.doc.doctype,
-							reason: reason_for_cancel
-						},
-						callback: function (r) {
-							if (!r.exc) {
-								frappe.msgprint("Document has been cancelled.");
-								d.hide();
-								cur_frm.reload_doc();
+							method: "admin_iiti.admin_iiti.doctype.outside_position.outside_position.cancel_noc_document", // change as per your app
+							args: {
+								docname: frm.doc.name,
+								doctype: frm.doc.doctype,
+								reason: reason_for_cancel
+							},
+							callback: function (r) {
+								if (!r.exc) {
+									frappe.msgprint("Document has been cancelled.");
+									d.hide();
+									cur_frm.reload_doc();
+								}
 							}
-						}
-					});
+						});
 					}
 				}
 			});

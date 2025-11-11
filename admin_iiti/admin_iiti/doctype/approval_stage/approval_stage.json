@@ -27,6 +27,7 @@
    "reqd": 1
   },
   {
+   "fetch_from": "approver_email.full_name",
    "fieldname": "approve_name",
    "fieldtype": "Data",
    "in_list_view": 1,
@@ -89,6 +90,7 @@
    "fieldname": "forwarded_status",
    "fieldtype": "Select",
    "label": "Forwarded Status",
+   "mandatory_depends_on": "eval:doc.is_forwarded_to == 1",
    "options": "\nForwarded By RO\nForwarded By DOA\nRecommended\nApproved"
   }
  ],

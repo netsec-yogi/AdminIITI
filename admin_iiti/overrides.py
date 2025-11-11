@@ -48,6 +48,7 @@ class CustomLeaveApplication(Document):
         validate_active_employee(self.employee)
         set_employee_name(self)
         self.validate_dates()
+        #self.validate_leave_balance_pending()
         self.validate_leave_balance()
         self.validate_leave_overlap()
         self.validate_max_days()
@@ -244,12 +245,12 @@ class CustomLeaveApplication(Document):
 			from `tabLeave Application`
 			where employee = %(employee)s and docstatus < 2 and status in ('Open', 'Approved')
 			and to_date >= %(from_date)s and from_date <= %(to_date)s
-			and name != %(name)s""",
+			and name != %(name)s and leave_type = %(leave_type)s""",
 			{
 				"employee": self.employee,
 				"from_date": self.from_date,
 				"to_date": self.to_date,
-				"name": self.name,
+				"name": self.name,"leave_type": self.leave_type,
 			},
 			as_dict=1,
 		):
@@ -286,14 +287,68 @@ class CustomLeaveApplication(Document):
             
         if self.half_day == 0:
             self.half_day_date = None
+            
+    def validate_leave_balance_pending(self):
+        if self.leave_type_name == 'Other Leave':
+            return
+        
+        if not self.leave_balance:
+            frappe.throw(_("Leave balance is not set for Leave Type {0} in this allocation.").format(
+                frappe.bold(self.leave_type)
+            ))
+            
+        leave_balance = self.leave_balance
+        
+        # Base SQL query
+        sql_query = """
+            SELECT SUM(total_leave_days)
+            FROM `tabLeave Application`
+            WHERE employee = %(employee)s
+            AND docstatus < 2
+            AND status IN ('Open', 'Recommended')
+            AND leave_type = %(leave_type)s
+        """
+        filters = {
+            "employee": self.employee,
+            "leave_type": self.leave_type,
+        }
+        # Add year filter only for RH or CL
+        if self.leave_type in ("Casual Leave", "Restricted Holiday Leave"):
+            current_year = getdate(nowdate()).year
+            sql_query += " AND YEAR(from_date) = %(current_year)s"
+            filters["current_year"] = current_year
+            
+        full_sql =  frappe.db.escape(sql_query % filters)
+        
+        # Execute and see result
+        result = frappe.db.sql(sql_query, filters, as_dict=True)
+        #frappe.msgprint(f"Query Result: {frappe.as_json(result)}")
+            
+        #employee_pending_leave = frappe.db.sql(sql_query, filters)[0][0] or 0
+        employee_pending_leave = result[0].get("SUM(total_leave_days)") if result and result[0] else 0
+
+        
+        # Calculate total (current + pending)
+        all_total_pending_leave = employee_pending_leave + self.total_leave_days
+        
+        # Validation: pending or insufficient balance
+        if float(leave_balance) < float(all_total_pending_leave):
+            msg = _("Warning: Insufficient leave balance for Leave Type {0}. You have already applied for leave, which is still pending, so you cannot apply for another leave. if you want to apply for kindly cancelled the old pending leave").format(
+                frappe.bold(self.leave_type)
+            )
+            frappe.throw(msg)
     
     def validate_leave_balance(self):
         #int(self.leave_balance)
-        if int(self.leave_balance) <= 0 and self.leave_type_name != 'Other Leave':
-            msg = _("Warning: Insufficient leave balance for Leave Type {0} in this allocation.").format(
-					frappe.bold(self.leave_type)
-				)
-            frappe.throw(msg)
+        if self.leave_type_name != 'Other Leave':
+            if self.leave_type == 'Leave Without Pay':
+                return
+            else:
+                if self.leave_balance <= 0:
+                    msg = _("Warning: Insufficient leave balance for Leave Type {0} in this allocation.").format(
+                        frappe.bold(self.leave_type)
+                        )
+                    frappe.throw(msg)
             
     def validate_leave_approver(self):
         if self.leave_approver == frappe.session.user:
@@ -311,7 +366,8 @@ class CustomLeaveApplication(Document):
             {"employee": self.employee, "half_day_date": self.half_day_date, "name": self.name},
         )[0][0]
         
-        return leave_count_on_half_day_date * 0.5      
+        
+        return leave_count_on_half_day_date * 0.5       
 
 @frappe.whitelist()
 def get_approvers(doctype, txt, searchfield, start, page_len, filters):

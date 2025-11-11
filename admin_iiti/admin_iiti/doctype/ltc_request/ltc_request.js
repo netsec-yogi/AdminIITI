@@ -7,6 +7,7 @@ frappe.ui.form.on('LTC Request', {
 		let logged_user = frappe.session.user;
 		if (frm.is_new()) {
 			frm.trigger("calculate_total_days");
+			frm.set_value('status','Open');
 		}else{
 			if(frappe.user.has_role('HR Dealing Assistant') && frm.doc.status == 'Open' || !frm.doc.owner == frappe.session.user ){
 				frm.add_custom_button(__('Proceed'), function () {
@@ -48,17 +49,15 @@ frappe.ui.form.on('LTC Request', {
 					.css({ 'color': '#ffffff', 'font-weight': 'bold', 'background-color': 'red' });
 			}
 
-			// if(frappe.session.user == frm.doc.owner){
-			// 	frm.disable_form();
-			// }
+			
 			if(frappe.user.has_role('HR Manager') || frm.doc.approver == logged_user){
-				if(frappe.session.user != 'hrmanager@iiti.ac.in'){
+				if(frappe.session.user != 'hrmanager@iiti.ac.in' && frappe.session.user !== 'Administrator'){
 					frm.disable_form();
 				}	
 			}
 			if(frappe.user.has_role('HR User') || frappe.user.has_role('HR Dealing Assistant')){
 				//frm.disable_form();
-				if(frappe.session.user != 'hrmanager@iiti.ac.in'){
+				if(frappe.session.user != 'hrmanager@iiti.ac.in' && frappe.session.user !== 'Administrator'){
 					frm.disable_save();
 				}
 			}
@@ -66,7 +65,7 @@ frappe.ui.form.on('LTC Request', {
 				frm.trigger('document_cancel');
 			}
 
-			if(frappe.session.user == 'hrmanager@iiti.ac.in' && frm.doc.status != 'Approve'){
+			if(frappe.session.user == 'hrmanager@iiti.ac.in' && frm.doc.status != 'Cancelled' && frm.doc.status != 'Sanction'){
 				frm.trigger('document_cancel');
 			}
 		}
@@ -107,14 +106,14 @@ frappe.ui.form.on('LTC Request', {
 				
 			}
 			if(frappe.user.has_role('HR Manager')){
-				if(frappe.session.user != 'hrmanager@iiti.ac.in'){
+				if(frappe.session.user != 'hrmanager@iiti.ac.in' && frappe.session.user !== 'Administrator'){
 					frm.disable_form();
 				}
 					
 			}
 			if(frappe.user.has_role('HR User')){
 				//frm.disable_form();
-				if(frappe.session.user != 'hrmanager@iiti.ac.in'){
+				if(frappe.session.user != 'hrmanager@iiti.ac.in' && frappe.session.user !== 'Administrator'){
 					frm.disable_save();
 				}
 			}
@@ -122,7 +121,7 @@ frappe.ui.form.on('LTC Request', {
 				frm.trigger('document_cancel');
 			}
 
-			if(frappe.session.user == 'hrmanager@iiti.ac.in' && frm.doc.status != 'Approve'){
+			if(frappe.session.user == 'hrmanager@iiti.ac.in' && frm.doc.status != 'Cancelled' && frm.doc.status != 'Sanction'){
 				frm.trigger('document_cancel');
 			}
 
@@ -183,7 +182,6 @@ frappe.ui.form.on('LTC Request', {
 			},
 			"callback": function (response) {
 				var data = response.message;
-				console.log('data',data);
 				if (data.name && data.docstatus != 2) {
 
 					frappe.msgprint(__("You already Applied LTC Request for this Leave Application"));

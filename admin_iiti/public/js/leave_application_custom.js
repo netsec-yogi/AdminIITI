@@ -49,7 +49,7 @@ frappe.ui.form.on("Leave Application", {
 				() => cancel_leave_application(frm)).addClass("btn-danger")
 				.css({ 'color': '#ffffff', 'font-weight': 'bold', 'background-color': '#17a2b8' });
 			}
-			frm.trigger("default_discussion_button");
+			//frm.trigger("default_discussion_button");
 			// if(frm.doc.leave_approver == logged_user && frm.doc.status == 'Approved'){
 			// 	frm.disable_form();
 			// 	frm.toggle_display('approved',false);
@@ -113,7 +113,7 @@ frappe.ui.form.on("Leave Application", {
 				() => cancel_leave_application(frm)).addClass("btn-danger")
 				.css({ 'color': '#ffffff', 'font-weight': 'bold', 'background-color': '#17a2b8' });
 			}
-			frm.trigger("default_discussion_button");
+			//frm.trigger("default_discussion_button");
 		}else{
 			frm.toggle_display('submit_form',true);
 			document.querySelectorAll("[data-fieldname='submit_form']")[1].style.backgroundColor="#00b2ff";
@@ -255,7 +255,7 @@ frappe.ui.form.on("Leave Application", {
 			args: {
 				doctype: "Holiday",
 				filters: {
-					"parent":'RH Holiday 2024',
+					"parent":'RH Holiday 2025',
 					"holiday_date":["between", [frm.doc.from_date,frm.doc.to_date]],
 				},
 				fields: ["holiday_date"],
