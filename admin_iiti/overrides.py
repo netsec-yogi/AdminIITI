@@ -48,7 +48,7 @@ class CustomLeaveApplication(Document):
         validate_active_employee(self.employee)
         set_employee_name(self)
         self.validate_dates()
-        self.validate_leave_balance_pending()
+        #self.validate_leave_balance_pending()
         self.validate_leave_balance()
         self.validate_leave_overlap()
         self.validate_max_days()
@@ -318,8 +318,15 @@ class CustomLeaveApplication(Document):
             sql_query += " AND YEAR(from_date) = %(current_year)s"
             filters["current_year"] = current_year
             
-        employee_pending_leave = frappe.db.sql(sql_query, filters)[0][0] or 0
+        full_sql =  frappe.db.escape(sql_query % filters)
         
+        # Execute and see result
+        result = frappe.db.sql(sql_query, filters, as_dict=True)
+        #frappe.msgprint(f"Query Result: {frappe.as_json(result)}")
+            
+        #employee_pending_leave = frappe.db.sql(sql_query, filters)[0][0] or 0
+        employee_pending_leave = result[0].get("SUM(total_leave_days)") if result and result[0] else 0
+
         
         # Calculate total (current + pending)
         all_total_pending_leave = employee_pending_leave + self.total_leave_days

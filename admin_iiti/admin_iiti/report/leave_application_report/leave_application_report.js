@@ -43,7 +43,7 @@ frappe.query_reports["Leave application report"] = {
       "options": ["", "Open", "Recommended", "Amended", "Approved", "Rejected", "Cancelled"].join("\n")
     },
     {
-      "fieldname": "grade",
+      "fieldname": "group",
       "label": __("Group"),
       "fieldtype": "Link",
       "options": "Employee Grade"

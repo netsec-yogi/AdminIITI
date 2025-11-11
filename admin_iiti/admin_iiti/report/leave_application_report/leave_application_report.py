@@ -23,10 +23,11 @@ def execute(filters=None):
 def get_columns():
     return [
         # {"label": _("Sl. No."), "fieldname": "idx", "fieldtype": "Int", "width": 70},
-        {"label": _("PNT"), "fieldname": "pnt", "fieldtype": "Link", "options": "Employee", "width": 110},
+        {"label": _("Name"), "fieldname": "name", "fieldtype": "Link", "options": "Leave Application", "width": 110},
+        {"label": _("PNT Number"), "fieldname": "pnt_number", "fieldtype": "Data", "width": 130},
         {"label": _("Employee Name"), "fieldname": "employee_name", "fieldtype": "Data", "width": 160},
-        {"label": _("Dsignation"), "fieldname": "designation", "fieldtype": "Link", "options": "Designation", "width": 130},
-        {"label": _("Group"), "fieldname": "group_name", "fieldtype": "Link", "options": "Employee Grade", "width": 110},
+        {"label": _("Designation"), "fieldname": "emp_designation", "fieldtype": "Data", "width": 130},
+        {"label": _("Group"), "fieldname": "group", "fieldtype": "Link", "options": "Leave Application", "width": 110},
         {"label": _("Leave Type"), "fieldname": "leave_type_name", "fieldtype": "Data", "width": 140},
         {"label": _("Application Date"), "fieldname": "application_date", "fieldtype": "Date", "width": 120},
         {"label": _("From"), "fieldname": "from_date", "fieldtype": "Date", "width": 110},
@@ -48,8 +49,8 @@ def get_filter_dict(filters):
         filter_dict["employee"] = filters["employee"]
     if filters.get("leave_type"):
         filter_dict["leave_type"] = filters["leave_type"]
-    if filters.get("grade"):
-        filter_dict["grade"] = filters["grade"]
+    if filters.get("group"):
+        filter_dict["group"] = filters["group"]
     if filters.get("status"):
         filter_dict["status"] = filters["status"]
     # Use posting date since it's for application timing; adjust to from_date/to_date window if that's preferred
@@ -66,8 +67,8 @@ def get_rows(filters):
     apps = frappe.get_all(
         "Leave Application",
         fields=[
-            "name", "employee as pnt", "employee_name", "approver_designation as designation",
-            "grade as group_name", "leave_type_name", "leave_type", "posting_date as application_date",
+            "name", "employee", "employee_name", "approver_designation as designation",
+            "group", "leave_type_name", "leave_type", "posting_date as application_date",
             "from_date", "to_date", "half_day", "total_leave_days", "description", "leave_approver as approving_authority",
             "leave_approver_name", "status as leave_status"
         ],
@@ -76,19 +77,28 @@ def get_rows(filters):
     )
     rows = []
     for idx, app in enumerate(apps, 1):
-        # Fetch all child table rows for this Leave Application data
+        # Fetch all child table rows for this Leave Application
         child_rows = frappe.get_all(
             "Leave Recommender",
             fields=["recommender_name"],
             filters={"parent": app["name"]}
         )
         names = [r["recommender_name"] for r in child_rows if r.get("recommender_name")]
+        # ✅ Fetch Employee Info (pnt, designation, department etc.)
+        emp_info = frappe.db.get_value(
+            "Employee",
+            app["employee"],
+            ["pnt_number", "designation as emp_designation"],
+            as_dict=True
+        ) or {}
         app_data = {
             "idx": idx,
-            "pnt": app["pnt"],
+            "name": app["name"],
             "employee_name": app["employee_name"],
             "designation": app["designation"],
-            "group_name": app["group_name"],
+            "pnt_number": emp_info.get("pnt_number") or '',
+            "emp_designation": emp_info.get("emp_designation") or '',  # prefer employee's designation
+            "group": app["group"],
             "leave_type_name": app["leave_type_name"] if app["leave_type_name"] else app["leave_type"],
             "application_date": app["application_date"],
             "from_date": app["from_date"],
